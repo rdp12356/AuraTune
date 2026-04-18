@@ -16,7 +16,7 @@ const PlayerScreen = lazy(() => import("./pages/PlayerScreen"));
 const OnboardingScreen = lazy(() => import("./pages/OnboardingScreen"));
 const StatsScreen = lazy(() => import("./pages/StatsScreen"));
 const ProfileScreen = lazy(() => import("./pages/ProfileScreen"));
-const NotFound = lazy(() => import("./pages/NotFound"));
+const ResetPasswordScreen = lazy(() => import("./pages/ResetPasswordScreen"));
 const BottomNav = lazy(() => import("./components/BottomNav"));
 const AchievementToast = lazy(() => import("./components/AchievementToast"));
 
@@ -90,6 +90,7 @@ function AppRoutes() {
         <Route path="/player" element={<PlayerScreen />} />
         <Route path="/stats" element={<StatsScreen />} />
         <Route path="/profile" element={<ProfileScreen />} />
+        <Route path="/reset-password" element={<ResetPasswordScreen />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       <BottomNav />
