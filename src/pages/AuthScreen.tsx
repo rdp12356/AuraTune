@@ -18,7 +18,8 @@ export default function AuthScreen() {
 
   // Auto-redirect to home when user is authenticated
   useEffect(() => {
-    if (user) {
+    // Only redirect if NOT on the reset-password page
+    if (user && window.location.pathname !== '/reset-password') {
       navigate('/');
     }
   }, [user, navigate]);
