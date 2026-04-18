@@ -45,8 +45,9 @@ export default function HomeScreen() {
 
       {/* Headphones notice */}
       <motion.div
-        initial={{ opacity: 0, y: 10 }}
+        initial={{ opacity: 0, y: 5 }}
         animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
         className="mx-5 mb-4 flex items-center gap-2.5 rounded-2xl glass px-4 py-3"
       >
         <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
@@ -172,7 +173,7 @@ export default function HomeScreen() {
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 0.3 }}
+        transition={{ delay: 0.2 }}
         className="mx-5 mt-4 mb-6 flex items-center justify-center gap-2 rounded-2xl border border-dashed border-border py-4"
       >
         <Sparkles size={14} className="text-muted-foreground" />

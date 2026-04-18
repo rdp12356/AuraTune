@@ -64,6 +64,7 @@ export default function PlayerScreen() {
           animate={isPlaying ? { scale: [1, 1.15, 1], opacity: [0.2, 0.5, 0.2] } : { scale: 1, opacity: 0.05 }}
           transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
           className="absolute w-80 h-80 rounded-full bg-primary/20 blur-3xl"
+          style={{ willChange: 'transform, opacity' }}
         />
 
         {/* Progress ring */}
