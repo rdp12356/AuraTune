@@ -252,18 +252,6 @@ export default function AuthScreen() {
           </>
         )}
 
-        <div className="mt-8 pt-6 border-t border-border/50 text-center">
-          <button
-            onClick={() => {
-              localStorage.setItem('guest_mode', 'true');
-              window.dispatchEvent(new Event('guest_mode_enabled'));
-              navigate('/');
-            }}
-            className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-          >
-            Skip for now & continue as guest
-          </button>
-        </div>
       </motion.div>
     </div>
   );
