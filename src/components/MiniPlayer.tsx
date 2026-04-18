@@ -1,75 +1,71 @@
-import { motion } from 'framer-motion';
-import { usePlayerState, usePlayerActions } from '@/context/PlayerContextCore';
-import { useNavigate } from 'react-router-dom';
-import { Play, Pause } from 'lucide-react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import { usePlayer } from '@/context/PlayerContextCore';
+import { Play, Pause, Music } from 'lucide-react';
 
 export default function MiniPlayer() {
-  const { preset, isPlaying, elapsed, timerSeconds } = usePlayerState();
-  const { pause, resume } = usePlayerActions();
+  const location = useLocation();
   const navigate = useNavigate();
+  const { preset, isPlaying, play, pause, resume } = usePlayer();
 
-  if (!preset) return null;
+  const hiddenRoutes = ['/player', '/onboarding', '/auth', '/reset-password'];
+  const isHidden = !preset || hiddenRoutes.includes(location.pathname);
 
-  const formatTime = (s: number) => {
-    const h = Math.floor(s / 3600);
-    const m = Math.floor((s % 3600) / 60);
-    const sec = s % 60;
-    if (h > 0) return `${h}:${m.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
-    return `${m}:${sec.toString().padStart(2, '0')}`;
+  if (isHidden) return null;
+
+  const handleToggle = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (isPlaying) {
+      pause();
+    } else {
+      resume();
+    }
   };
 
-  const remaining = timerSeconds ? Math.max(timerSeconds - elapsed, 0) : null;
-  const progress = timerSeconds ? Math.min(elapsed / timerSeconds, 1) : 0;
-
   return (
-    <motion.div
-      initial={{ y: 80 }}
-      animate={{ y: 0 }}
-      className="fixed bottom-16 left-4 right-4 z-50"
-    >
-      <button
+    <AnimatePresence>
+      <motion.div
+        initial={{ y: 100, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        exit={{ y: 100, opacity: 0 }}
         onClick={() => navigate('/player')}
-        className="w-full glass rounded-2xl p-3 flex items-center gap-3 glow-primary relative overflow-hidden"
+        className="fixed bottom-[72px] left-4 right-4 z-30 glass-card rounded-2xl p-3 flex items-center justify-between shadow-2xl border border-primary/20 cursor-pointer overflow-hidden group active:scale-[0.98] transition-transform"
       >
-        {/* Progress bar at bottom */}
-        {timerSeconds && (
-          <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-muted">
-            <motion.div
-              className="h-full bg-primary"
-              animate={{ width: `${progress * 100}%` }}
-            />
-          </div>
-        )}
+        {/* Progress bar background */}
+        <div className="absolute top-0 left-0 right-0 h-[2px] bg-muted/20" />
         
-        <motion.div
-          animate={isPlaying ? { scale: [1, 1.1, 1] } : {}}
-          transition={{ duration: 2, repeat: Infinity }}
-          className="text-2xl"
-        >
-          {preset.icon}
-        </motion.div>
-        <div className="flex-1 text-left min-w-0">
-          <p className="text-sm font-semibold text-foreground truncate">{preset.name}</p>
-          <p className="text-xs text-muted-foreground">
-            {remaining !== null ? `${formatTime(remaining)} left` : formatTime(elapsed)}
-          </p>
+        <div className="flex items-center gap-3 overflow-hidden">
+          <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center relative shrink-0">
+            <span className="text-xl relative z-10">{preset.icon}</span>
+            {isPlaying && (
+              <motion.div 
+                animate={{ scale: [1, 1.2, 1] }} 
+                transition={{ duration: 2, repeat: Infinity }}
+                className="absolute inset-0 rounded-xl bg-primary/20" 
+              />
+            )}
+          </div>
+          
+          <div className="overflow-hidden">
+            <h4 className="text-sm font-bold text-foreground truncate">{preset.name}</h4>
+            <p className="text-[10px] text-muted-foreground flex items-center gap-1">
+              <Music size={10} />
+              {preset.category}
+            </p>
+          </div>
         </div>
-        <motion.div
-          whileTap={{ scale: 0.85 }}
-          onTap={(e) => {
-            e.stopPropagation();
-            if (isPlaying) {
-              pause();
-            } else {
-              resume();
-            }
-          }}
-          className="relative w-10 h-10 rounded-full bg-primary flex items-center justify-center cursor-pointer"
+
+        <button
+          onClick={handleToggle}
+          className="w-10 h-10 rounded-full bg-primary/15 flex items-center justify-center hover:bg-primary/25 transition-colors group-hover:scale-110"
         >
-          <div className="absolute inset-0 z-10" />
-          {isPlaying ? <Pause size={18} className="text-primary-foreground pointer-events-none" /> : <Play size={18} className="text-primary-foreground ml-0.5 pointer-events-none" />}
-        </motion.div>
-      </button>
-    </motion.div>
+          {isPlaying ? (
+            <Pause size={18} className="text-primary fill-primary" />
+          ) : (
+            <Play size={18} className="text-primary fill-primary ml-0.5" />
+          )}
+        </button>
+      </motion.div>
+    </AnimatePresence>
   );
 }

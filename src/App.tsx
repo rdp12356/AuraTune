@@ -18,6 +18,7 @@ const StatsScreen = lazy(() => import("./pages/StatsScreen"));
 const ProfileScreen = lazy(() => import("./pages/ProfileScreen"));
 const ResetPasswordScreen = lazy(() => import("./pages/ResetPasswordScreen"));
 const NotFound = lazy(() => import("./pages/NotFound"));
+const MiniPlayer = lazy(() => import("./components/MiniPlayer"));
 const BottomNav = lazy(() => import("./components/BottomNav"));
 const AchievementToast = lazy(() => import("./components/AchievementToast"));
 
@@ -89,6 +90,7 @@ function AppRoutes() {
           </>
         )}
       </Routes>
+      <MiniPlayer />
       {onboardingDone && (user || guestMode) && <BottomNav />}
     </SessionTrackerProvider>
   );
