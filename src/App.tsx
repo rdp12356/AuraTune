@@ -67,34 +67,29 @@ function AppRoutes() {
     return <AppLoading />;
   }
 
-  if (!onboardingDone) {
-    return (
-      <Routes>
-        <Route path="*" element={<OnboardingScreen />} />
-      </Routes>
-    );
-  }
-
-  if (!user && !guestMode) {
-    return (
-      <Routes>
-        <Route path="*" element={<AuthScreen />} />
-      </Routes>
-    );
-  }
-
   return (
     <SessionTrackerProvider>
       <AchievementToast />
       <Routes>
-        <Route path="/" element={<HomeScreen />} />
-        <Route path="/player" element={<PlayerScreen />} />
-        <Route path="/stats" element={<StatsScreen />} />
-        <Route path="/profile" element={<ProfileScreen />} />
+        {/* Public/Special Routes */}
         <Route path="/reset-password" element={<ResetPasswordScreen />} />
-        <Route path="*" element={<NotFound />} />
+        
+        {/* Guarded Routes */}
+        {!onboardingDone ? (
+          <Route path="*" element={<OnboardingScreen />} />
+        ) : !user && !guestMode ? (
+          <Route path="*" element={<AuthScreen />} />
+        ) : (
+          <>
+            <Route path="/" element={<HomeScreen />} />
+            <Route path="/player" element={<PlayerScreen />} />
+            <Route path="/stats" element={<StatsScreen />} />
+            <Route path="/profile" element={<ProfileScreen />} />
+            <Route path="*" element={<NotFound />} />
+          </>
+        )}
       </Routes>
-      <BottomNav />
+      {onboardingDone && (user || guestMode) && <BottomNav />}
     </SessionTrackerProvider>
   );
 }
