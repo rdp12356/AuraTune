@@ -21,6 +21,7 @@ const NotFound = lazy(() => import("./pages/NotFound"));
 const MiniPlayer = lazy(() => import("./components/MiniPlayer"));
 const BottomNav = lazy(() => import("./components/BottomNav"));
 const AchievementToast = lazy(() => import("./components/AchievementToast"));
+import { toast } from "sonner";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -48,6 +49,19 @@ function AppRoutes() {
   const { loading, user } = useAuth();
   const [onboardingDone, setOnboardingDone] = useState(() => localStorage.getItem('onboarding_complete') === 'true');
   const [guestMode, setGuestMode] = useState(() => localStorage.getItem('guest_mode') === 'true');
+
+  useEffect(() => {
+    // Handle error parameters from Supabase (e.g. expired links)
+    const hash = window.location.hash.substring(1);
+    const params = new URLSearchParams(hash);
+    const errorDescription = params.get('error_description');
+    
+    if (errorDescription) {
+      toast.error(errorDescription.replace(/\+/g, ' '));
+      // Clear the hash without reloading the page
+      window.history.replaceState(null, '', window.location.pathname + window.location.search);
+    }
+  }, []);
 
   useEffect(() => {
     const handleOnboardingComplete = () => {
