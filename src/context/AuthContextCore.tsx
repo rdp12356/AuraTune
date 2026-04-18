@@ -5,7 +5,7 @@ export interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
-  signUp: (email: string, password: string, emailRedirectTo?: string) => Promise<{ error: Error | null }>;
+  signUp: (email: string, password: string, name?: string, emailRedirectTo?: string) => Promise<{ error: Error | null }>;
   resendSignUpEmail: (email: string, emailRedirectTo?: string) => Promise<{ error: Error | null }>;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signInWithGoogle: () => Promise<{ error: Error | null }>;

@@ -89,7 +89,8 @@ export default function ProfileScreen() {
               🧠
             </div>
             <div className="flex-1 min-w-0">
-              <p className="font-semibold text-foreground truncate">{user.email}</p>
+              <p className="font-bold text-foreground truncate">{user.user_metadata?.full_name || user.user_metadata?.name || 'AuraTune User'}</p>
+              <p className="text-xs text-muted-foreground truncate">{user.email}</p>
               <div className="flex items-center gap-3 mt-1.5">
                 <span className="text-xs text-muted-foreground flex items-center gap-1">
                   <Flame size={12} className="text-warm" />

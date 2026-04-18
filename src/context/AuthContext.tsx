@@ -24,11 +24,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => subscription.unsubscribe();
   }, []);
 
-  const signUp = async (email: string, password: string, emailRedirectTo?: string) => {
+  const signUp = async (email: string, password: string, name?: string, emailRedirectTo?: string) => {
     const { error } = await supabase.auth.signUp({
       email,
       password,
-      options: emailRedirectTo ? { emailRedirectTo } : undefined,
+      options: {
+        emailRedirectTo: emailRedirectTo || undefined,
+        data: name ? { full_name: name, name: name } : undefined,
+      },
     });
     return { error };
   };

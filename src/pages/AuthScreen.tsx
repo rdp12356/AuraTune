@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContextCore';
-import { Mail, Lock, ArrowRight, Loader2, Sparkles } from 'lucide-react';
+import { Mail, Lock, ArrowRight, Loader2, Sparkles, User as UserIcon } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function AuthScreen() {
@@ -14,6 +14,7 @@ export default function AuthScreen() {
   const [loading, setLoading] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
   const [signupEmailSent, setSignupEmailSent] = useState(false);
+  const [fullName, setFullName] = useState('');
 
   // Auto-redirect to home when user is authenticated
   useEffect(() => {
@@ -30,7 +31,7 @@ export default function AuthScreen() {
     const emailRedirectTo = window.location.origin;
 
     const { error } = isSignUp
-      ? await signUp(email, password, emailRedirectTo)
+      ? await signUp(email, password, fullName, emailRedirectTo)
       : await signIn(email, password);
 
     setLoading(false);
@@ -87,6 +88,23 @@ export default function AuthScreen() {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-3.5">
+          {isSignUp && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              className="relative"
+            >
+              <UserIcon size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
+              <input
+                type="text"
+                placeholder="Full Name"
+                value={fullName}
+                onChange={e => setFullName(e.target.value)}
+                className="w-full glass rounded-xl pl-11 pr-4 py-3.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary transition-shadow"
+                required={isSignUp}
+              />
+            </motion.div>
+          )}
           <div className="relative">
             <Mail size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
             <input
