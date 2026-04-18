@@ -11,6 +11,7 @@ export default function ResetPasswordScreen() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const { user } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,8 +34,8 @@ export default function ResetPasswordScreen() {
     if (error) {
       toast.error(error.message);
     } else {
-      toast.success('Password updated successfully! Please sign in with your new password.');
-      navigate('/');
+      toast.success('Password updated successfully!');
+      navigate(user ? '/profile' : '/');
     }
   };
 
@@ -60,7 +61,7 @@ export default function ResetPasswordScreen() {
           </motion.div>
           <h1 className="text-3xl font-bold text-foreground">AuraTune</h1>
           <p className="text-muted-foreground mt-2 text-sm">
-            Set your new password below
+            {user ? 'Choose a strong new password' : 'Set your new password below'}
           </p>
         </div>
 
@@ -104,13 +105,24 @@ export default function ResetPasswordScreen() {
         </form>
 
         <p className="text-center text-sm text-muted-foreground mt-8">
-          Remembered your password?{' '}
-          <button
-            onClick={() => navigate('/')}
-            className="text-primary font-semibold"
-          >
-            Sign In
-          </button>
+          {user ? (
+            <button
+              onClick={() => navigate('/profile')}
+              className="text-primary font-semibold"
+            >
+              Back to Profile
+            </button>
+          ) : (
+            <>
+              Remembered your password?{' '}
+              <button
+                onClick={() => navigate('/')}
+                className="text-primary font-semibold"
+              >
+                Sign In
+              </button>
+            </>
+          )}
         </p>
       </motion.div>
     </div>

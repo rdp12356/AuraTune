@@ -1,13 +1,15 @@
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/context/AuthContextCore';
 import { useStats } from '@/hooks/useStats';
 import { useTheme } from '@/context/ThemeContext';
 import { achievementDefs } from '@/lib/achievements';
-import { LogOut, Sun, Moon, Flame, Trophy, Clock, Zap, Sparkles, MessageSquare } from 'lucide-react';
+import { LogOut, Sun, Moon, Flame, Trophy, Clock, Zap, Sparkles, MessageSquare, Lock } from 'lucide-react';
 import { useState } from 'react';
 import FeedbackModal from '@/components/FeedbackModal';
 
 export default function ProfileScreen() {
+  const navigate = useNavigate();
   const { user, signOut } = useAuth();
   const { streak, achievements, totalMinutes, totalSessions } = useStats();
   const { theme, toggle } = useTheme();
@@ -196,6 +198,16 @@ export default function ProfileScreen() {
                 className="w-5 h-5 rounded-full bg-card shadow-sm"
               />
             </div>
+          </button>
+
+          <div className="border-t border-border/30" />
+
+          <button
+            onClick={() => navigate('/reset-password')}
+            className="w-full flex items-center gap-3 px-5 py-4 hover:bg-muted/30 transition-colors active:bg-muted/40"
+          >
+            <Lock size={16} className="text-foreground" />
+            <span className="text-sm text-foreground">Change Password</span>
           </button>
 
           <div className="border-t border-border/30" />
