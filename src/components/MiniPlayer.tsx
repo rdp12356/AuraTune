@@ -29,7 +29,7 @@ export default function MiniPlayer() {
         animate={{ y: 0, opacity: 1 }}
         exit={{ y: 100, opacity: 0 }}
         onClick={() => navigate('/player')}
-        className="fixed bottom-[72px] left-4 right-4 z-30 glass-card rounded-2xl p-3 flex items-center justify-between shadow-2xl border border-primary/20 cursor-pointer overflow-hidden group active:scale-[0.98] transition-transform"
+        className="fixed bottom-[72px] left-4 right-4 z-30 bg-card/95 backdrop-blur-md rounded-2xl p-3 flex items-center justify-between shadow-2xl border border-primary/20 cursor-pointer overflow-hidden group active:scale-[0.98] transition-transform"
       >
         {/* Progress bar background */}
         <div className="absolute top-0 left-0 right-0 h-[2px] bg-muted/20" />
