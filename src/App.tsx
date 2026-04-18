@@ -68,6 +68,19 @@ function AppRoutes() {
     return <AppLoading />;
   }
 
+  // Handle Reset Password route separately to bypass all guards
+  const normalizedPath = window.location.pathname.replace(/\/$/, "");
+  if (normalizedPath === "/reset-password") {
+    return (
+      <SessionTrackerProvider>
+        <AchievementToast />
+        <Routes>
+          <Route path="/reset-password" element={<ResetPasswordScreen />} />
+        </Routes>
+      </SessionTrackerProvider>
+    );
+  }
+
   return (
     <SessionTrackerProvider>
       <AchievementToast />
