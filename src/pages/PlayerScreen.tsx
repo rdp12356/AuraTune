@@ -175,13 +175,6 @@ export default function PlayerScreen() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setShowQuickVolume(false)}
-            <motion.button
-              type="button"
-              aria-label="Close controls"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setShowQuickVolume(false)}
               className="absolute inset-0 bg-black/40 backdrop-blur-sm z-30 rounded-[2rem]"
             />
             <motion.div
