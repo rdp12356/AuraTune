@@ -3,6 +3,8 @@ import { ArrowRight, Brain, Clock, Smartphone, Sparkles, Target } from 'lucide-r
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import AppLogo from '@/components/AppLogo';
+
 const QUICK_PRESETS = [
   { label: '2 hours', minutes: 120 },
   { label: '4 hours', minutes: 240 },
@@ -98,9 +100,9 @@ export default function OnboardingScreen() {
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ type: 'spring', delay: 0.2 }}
-              className="w-20 h-20 rounded-3xl bg-primary/10 flex items-center justify-center mb-8"
+              className="w-20 h-20 mb-8"
             >
-              <Smartphone size={36} className="text-primary" />
+              <AppLogo className="w-20 h-20" imageClassName="p-2" />
             </motion.div>
 
             <h2 className="text-2xl font-bold text-foreground text-center mb-2">
@@ -402,9 +404,9 @@ export default function OnboardingScreen() {
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ type: 'spring', delay: 0.2 }}
-              className="w-24 h-24 rounded-3xl bg-primary/20 flex items-center justify-center mb-8"
+              className="w-24 h-24 mb-8"
             >
-              <Sparkles size={44} className="text-primary" />
+              <AppLogo className="w-24 h-24" imageClassName="p-2" />
             </motion.div>
 
             <motion.h2

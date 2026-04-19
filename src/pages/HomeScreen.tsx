@@ -4,6 +4,7 @@ import { memo, useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import MiniPlayer from '@/components/MiniPlayer';
+import AppLogo from '@/components/AppLogo';
 import { usePlayerActions, usePlayerState } from '@/context/PlayerContextCore';
 import { useTheme } from '@/context/ThemeContext';
 import { useFavorites } from '@/hooks/useFavorites';
@@ -39,9 +40,12 @@ export default function HomeScreen() {
     <div className="min-h-screen gradient-mesh pb-28">
       {/* Header */}
       <div className="flex items-center justify-between px-5 pt-12 pb-4">
-        <div>
+        <div className="flex items-center gap-3">
+          <AppLogo className="w-11 h-11" imageClassName="p-1" />
+          <div>
           <h1 className="text-2xl font-bold text-foreground">AuraTune</h1>
           <p className="text-sm text-muted-foreground mt-0.5">Tune your mind</p>
+          </div>
         </div>
         <div className="flex items-center gap-3">
           <motion.button whileTap={{ scale: 0.9 }} onClick={toggle}

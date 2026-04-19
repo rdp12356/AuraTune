@@ -19,7 +19,7 @@ export default defineConfig(({ mode }) => ({
     mode === "development" && componentTagger(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
+      includeAssets: ['favicon.ico', 'logo-192.png', 'logo.png'],
       manifest: {
         name: 'AuraTune',
         short_name: 'AuraTune',
@@ -27,17 +27,17 @@ export default defineConfig(({ mode }) => ({
         theme_color: '#0D0D0E',
         icons: [
           {
-            src: 'pwa-192x192.png',
+            src: 'logo-192.png',
             sizes: '192x192',
             type: 'image/png'
           },
           {
-            src: 'pwa-512x512.png',
+            src: 'logo.png',
             sizes: '512x512',
             type: 'image/png'
           },
           {
-            src: 'pwa-512x512.png',
+            src: 'logo.png',
             sizes: '512x512',
             type: 'image/png',
             purpose: 'any maskable'
@@ -57,7 +57,7 @@ export default defineConfig(({ mode }) => ({
     dedupe: ["react", "react-dom", "react/jsx-runtime", "react/jsx-dev-runtime"],
   },
   build: {
-    target: "ES2020",
+    target: "ES2017",
     minify: "esbuild",
     rollupOptions: {
       output: {

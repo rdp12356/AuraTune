@@ -12,6 +12,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
+import AppLogo from '@/components/AppLogo';
 import { useAuth } from '@/context/AuthContextCore';
 
 export default function AuthScreen() {
@@ -101,9 +102,9 @@ export default function AuthScreen() {
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ type: 'spring', delay: 0.1 }}
-            className="w-16 h-16 rounded-2xl bg-primary/15 flex items-center justify-center mx-auto mb-5"
+            className="w-16 h-16 mx-auto mb-5"
           >
-            <Sparkles size={28} className="text-primary" />
+            <AppLogo className="w-16 h-16" imageClassName="p-1.5" />
           </motion.div>
           <h1 className="text-3xl font-bold text-foreground">AuraTune</h1>
           <p className="text-muted-foreground mt-2 text-sm">
