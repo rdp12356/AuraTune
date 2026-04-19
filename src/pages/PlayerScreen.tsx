@@ -181,10 +181,8 @@ export default function PlayerScreen() {
               initial={{ opacity: 0, scale: 0.95, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 10 }}
-              className="fixed left-1/2 -translate-x-1/2 bottom-5 sm:bottom-auto sm:top-1/2 sm:-translate-y-1/2 w-[calc(100%-1.5rem)] sm:w-full max-w-[400px] sm:max-w-md max-h-[85vh] overflow-y-auto glass-heavy rounded-2xl sm:rounded-3xl px-6 py-5 shadow-2xl z-40"
+              className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100%-2rem)] max-w-md max-h-[85vh] overflow-y-auto glass-heavy rounded-[2rem] px-6 py-6 shadow-2xl z-40"
             >
-              {/* Mobile handle indicator */}
-              <div className="w-12 h-1 bg-muted/40 rounded-full mx-auto mb-5 sm:hidden" />
               <div className="flex gap-1 mb-4 bg-muted/30 rounded-xl p-1">
                 <button
                   onClick={() => setSettingsTab('sound')}
