@@ -80,7 +80,7 @@ export default function PlayerScreen() {
       </div>
 
       {/* Center - Progress ring & controls */}
-      <div className="flex-1 flex flex-col items-center justify-center px-5">
+      <div className="flex-1 flex flex-col items-center justify-center px-5 relative">
         {/* Animated glow behind */}
         <motion.div
           animate={isPlaying ? { scale: [1, 1.15, 1], opacity: [0.2, 0.5, 0.2] } : { scale: 1, opacity: 0.05 }}
@@ -175,13 +175,20 @@ export default function PlayerScreen() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setShowQuickVolume(false)}
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-30"
+            <motion.button
+              type="button"
+              aria-label="Close controls"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowQuickVolume(false)}
+              className="absolute inset-0 bg-black/40 backdrop-blur-sm z-30 rounded-[2rem]"
             />
             <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 10 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 10 }}
-              className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100%-2rem)] max-w-md max-h-[85vh] overflow-y-auto glass-heavy rounded-[2rem] px-6 py-6 shadow-2xl z-40"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100%-2rem)] max-w-sm max-h-[75vh] overflow-y-auto glass-heavy border-primary/20 rounded-[2.5rem] px-6 py-8 shadow-2xl z-40 transition-all"
             >
               <div className="flex gap-1 mb-4 bg-muted/30 rounded-xl p-1">
                 <button
