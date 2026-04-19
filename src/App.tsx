@@ -1,27 +1,28 @@
-import { lazy, Suspense, useState, useEffect } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { toast } from "sonner";
+
+import AchievementToast from "@/components/AchievementToast";
+import BottomNav from "@/components/BottomNav";
+import MiniPlayer from "@/components/MiniPlayer";
+import { SessionTrackerProvider } from "./components/SessionTrackerProvider";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { PlayerProvider } from "@/context/PlayerContext";
-import { ThemeProvider } from "@/context/ThemeContext";
 import { AuthProvider } from "@/context/AuthContext";
 import { useAuth } from "@/context/AuthContextCore";
-import { SessionTrackerProvider } from "./components/SessionTrackerProvider";
+import { PlayerProvider } from "@/context/PlayerContext";
+import { ThemeProvider } from "@/context/ThemeContext";
 
-const HomeScreen = lazy(() => import("./pages/HomeScreen"));
 const AuthScreen = lazy(() => import("./pages/AuthScreen"));
-const PlayerScreen = lazy(() => import("./pages/PlayerScreen"));
+const HomeScreen = lazy(() => import("./pages/HomeScreen"));
+const NotFound = lazy(() => import("./pages/NotFound"));
 const OnboardingScreen = lazy(() => import("./pages/OnboardingScreen"));
-const StatsScreen = lazy(() => import("./pages/StatsScreen"));
+const PlayerScreen = lazy(() => import("./pages/PlayerScreen"));
 const ProfileScreen = lazy(() => import("./pages/ProfileScreen"));
 const ResetPasswordScreen = lazy(() => import("./pages/ResetPasswordScreen"));
-const NotFound = lazy(() => import("./pages/NotFound"));
-const MiniPlayer = lazy(() => import("./components/MiniPlayer"));
-const BottomNav = lazy(() => import("./components/BottomNav"));
-const AchievementToast = lazy(() => import("./components/AchievementToast"));
-import { toast } from "sonner";
+const StatsScreen = lazy(() => import("./pages/StatsScreen"));
 
 const queryClient = new QueryClient({
   defaultOptions: {

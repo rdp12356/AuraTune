@@ -1,10 +1,11 @@
+import { AnimatePresence, motion } from 'framer-motion';
+import { CheckCircle, Send, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { X, Send, CheckCircle } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/context/AuthContextCore';
-import { toast } from 'sonner';
 import { createPortal } from 'react-dom';
+import { toast } from 'sonner';
+
+import { useAuth } from '@/context/AuthContextCore';
+import { supabase } from '@/integrations/supabase/client';
 
 interface Props {
   open: boolean;

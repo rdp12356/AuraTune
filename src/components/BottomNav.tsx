@@ -1,7 +1,7 @@
+import { motion } from 'framer-motion';
+import { BarChart3, Home, User } from 'lucide-react';
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Home, BarChart3, User } from 'lucide-react';
-import { motion } from 'framer-motion';
 
 const tabs = [
   { path: '/', icon: Home, label: 'Home' },

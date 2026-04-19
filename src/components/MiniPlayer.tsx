@@ -1,7 +1,8 @@
+import { AnimatePresence, motion } from 'framer-motion';
+import { Music, Pause, Play } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+
 import { usePlayer } from '@/context/PlayerContextCore';
-import { Play, Pause, Music } from 'lucide-react';
 
 export default function MiniPlayer() {
   const location = useLocation();

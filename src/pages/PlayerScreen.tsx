@@ -1,10 +1,11 @@
-import { motion, AnimatePresence } from 'framer-motion';
-import { usePlayerState, usePlayerActions } from '@/context/PlayerContextCore';
-import { useNavigate } from 'react-router-dom';
-import { Play, Pause, Square, ChevronDown, Volume2, Timer, Brain, Moon } from 'lucide-react';
-import { backgroundSounds, timerPresets, smartRoutines } from '@/lib/presets';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Brain, ChevronDown, Moon, Pause, Play, Square, Timer, Volume2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 import BrainAnimation from '@/components/BrainAnimation';
+import { usePlayerActions, usePlayerState } from '@/context/PlayerContextCore';
+import { backgroundSounds, smartRoutines, timerPresets } from '@/lib/presets';
 
 export default function PlayerScreen() {
   const {

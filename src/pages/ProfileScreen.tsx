@@ -1,12 +1,24 @@
-import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { useAuth } from '@/context/AuthContextCore';
-import { useStats } from '@/hooks/useStats';
-import { useTheme } from '@/context/ThemeContext';
-import { achievementDefs } from '@/lib/achievements';
-import { LogOut, Sun, Moon, Flame, Trophy, Clock, Zap, Sparkles, MessageSquare, Lock } from 'lucide-react';
+import {
+  Clock,
+  Flame,
+  Lock,
+  LogOut,
+  MessageSquare,
+  Moon,
+  Sparkles,
+  Sun,
+  Trophy,
+  Zap,
+} from 'lucide-react';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 import FeedbackModal from '@/components/FeedbackModal';
+import { useAuth } from '@/context/AuthContextCore';
+import { useTheme } from '@/context/ThemeContext';
+import { useStats } from '@/hooks/useStats';
+import { achievementDefs } from '@/lib/achievements';
 
 export default function ProfileScreen() {
   const navigate = useNavigate();

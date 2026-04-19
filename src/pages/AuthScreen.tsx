@@ -1,9 +1,18 @@
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
+import {
+  ArrowRight,
+  Keyboard,
+  Loader2,
+  Lock,
+  Mail,
+  Sparkles,
+  User as UserIcon,
+} from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/context/AuthContextCore';
-import { Mail, Lock, ArrowRight, Loader2, Sparkles, User as UserIcon, Keyboard } from 'lucide-react';
 import { toast } from 'sonner';
+
+import { useAuth } from '@/context/AuthContextCore';
 
 export default function AuthScreen() {
   const navigate = useNavigate();

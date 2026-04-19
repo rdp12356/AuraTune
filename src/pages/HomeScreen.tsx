@@ -1,12 +1,21 @@
-import { motion, AnimatePresence } from 'framer-motion';
-import { categories, presets, moods, getRecommendedPresets, type Category, type Mood, type FrequencyPreset } from '@/lib/presets';
-import { useState, useCallback, memo } from 'react';
-import { usePlayerState, usePlayerActions } from '@/context/PlayerContextCore';
+import { AnimatePresence, motion } from 'framer-motion';
+import { ChevronRight, Headphones, Heart, Moon, Sparkles, Sun } from 'lucide-react';
+import { memo, useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+
+import MiniPlayer from '@/components/MiniPlayer';
+import { usePlayerActions, usePlayerState } from '@/context/PlayerContextCore';
 import { useTheme } from '@/context/ThemeContext';
 import { useFavorites } from '@/hooks/useFavorites';
-import { Sun, Moon, Headphones, Heart, Sparkles, ChevronRight } from 'lucide-react';
-import MiniPlayer from '@/components/MiniPlayer';
+import {
+  type Category,
+  type FrequencyPreset,
+  type Mood,
+  categories,
+  getRecommendedPresets,
+  moods,
+  presets,
+} from '@/lib/presets';
 
 export default function HomeScreen() {
   const [activeCategory, setActiveCategory] = useState<Category>('focus');

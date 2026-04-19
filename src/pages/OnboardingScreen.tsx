@@ -1,7 +1,7 @@
-import { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
+import { ArrowRight, Brain, Clock, Smartphone, Sparkles, Target } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Smartphone, Clock, Brain, Sparkles, Target, ArrowRight } from 'lucide-react';
 
 const QUICK_PRESETS = [
   { label: '2 hours', minutes: 120 },

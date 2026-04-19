@@ -1,9 +1,10 @@
-import { useState } from 'react';
 import { motion } from 'framer-motion';
+import { ArrowRight, Loader2, Lock, Sparkles } from 'lucide-react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/context/AuthContextCore';
-import { Lock, ArrowRight, Loader2, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
+
+import { useAuth } from '@/context/AuthContextCore';
 
 export default function ResetPasswordScreen() {
   const navigate = useNavigate();

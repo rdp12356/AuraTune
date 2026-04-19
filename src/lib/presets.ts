@@ -43,18 +43,18 @@ export const presets: FrequencyPreset[] = [
   { id: 'theta-6', name: 'Drift Off', description: '6Hz Theta to ease into sleep', benefit: 'Gently transitions your mind into sleep', category: 'sleep', carrierHz: 160, beatHz: 6, waveType: 'Theta', icon: '🌜', color: 'warm', moods: ['stressed', 'tired'] },
 
   // Meditation (3 main)
-  { id: 'theta-7', name: 'Zen Mind', description: '7Hz Theta for deep meditation', benefit: 'Deepens meditation and spiritual awareness', category: 'meditation', carrierHz: 170, beatHz: 7, waveType: 'Theta', icon: '🧘', color: 'accent', moods: ['stressed', 'calm'] },
-  { id: 'alpha-10', name: 'Mindfulness', description: '10Hz Alpha for present awareness', benefit: 'Cultivates present-moment awareness', category: 'meditation', carrierHz: 200, beatHz: 10, waveType: 'Alpha', icon: '🕊️', color: 'accent', moods: ['stressed', 'distracted'] },
   { id: 'solf-528', name: '528Hz Love', description: 'Solfeggio frequency of transformation', benefit: 'Harmonizes body and mind at cellular level', category: 'meditation', carrierHz: 528, beatHz: 7, waveType: 'Solfeggio', icon: '💜', color: 'accent', moods: ['calm'] },
+  { id: 'alpha-10', name: 'Mindfulness', description: '10Hz Alpha for present awareness', benefit: 'Cultivates present-moment awareness', category: 'meditation', carrierHz: 200, beatHz: 10, waveType: 'Alpha', icon: '🕊️', color: 'accent', moods: ['stressed', 'distracted'] },
+  { id: 'theta-7', name: 'Zen Mind', description: '7Hz Theta for deep meditation', benefit: 'Deepens meditation and spiritual awareness', category: 'meditation', carrierHz: 170, beatHz: 7, waveType: 'Theta', icon: '🧘', color: 'accent', moods: ['stressed', 'calm'] },
 
-  // Exercise (3 main — added one)
-  { id: 'gamma-40', name: 'Peak Power', description: '40Hz Gamma for peak physical performance', benefit: 'Maximizes power output and focus during workouts', category: 'exercise', carrierHz: 300, beatHz: 40, waveType: 'Gamma', icon: '⚡', color: 'primary', moods: ['unmotivated'] },
+  // Exercise (3 main)
   { id: 'beta-20', name: 'Cardio Boost', description: '20Hz Beta for high-energy workouts', benefit: 'Elevates heart rate and workout intensity', category: 'exercise', carrierHz: 250, beatHz: 20, waveType: 'Beta', icon: '🏃', color: 'primary', moods: ['tired', 'unmotivated'] },
   { id: 'beta-25', name: 'Endurance', description: '25Hz Beta for sustained physical effort', benefit: 'Builds mental toughness for longer sessions', category: 'exercise', carrierHz: 270, beatHz: 25, waveType: 'Beta', icon: '🔥', color: 'primary', moods: ['unmotivated'] },
+  { id: 'gamma-40', name: 'Peak Power', description: '40Hz Gamma for peak physical performance', benefit: 'Maximizes power output and focus during workouts', category: 'exercise', carrierHz: 300, beatHz: 40, waveType: 'Gamma', icon: '⚡', color: 'primary', moods: ['unmotivated'] },
 
-  // Relax (3 main — added one)
-  { id: 'alpha-8', name: 'Calm Waves', description: '8Hz Alpha for gentle relaxation', benefit: 'Soothes anxiety and calms the nervous system', category: 'relax', carrierHz: 190, beatHz: 8, waveType: 'Alpha', icon: '🌊', color: 'primary', moods: ['stressed'] },
+  // Relax (3 main)
   { id: 'solf-432', name: '432Hz Harmony', description: 'Universal harmony frequency', benefit: 'Aligns your body with natural vibrations', category: 'relax', carrierHz: 432, beatHz: 6, waveType: 'Solfeggio', icon: '🎵', color: 'accent', moods: ['stressed', 'calm'] },
+  { id: 'alpha-8', name: 'Calm Waves', description: '8Hz Alpha for gentle relaxation', benefit: 'Soothes anxiety and calms the nervous system', category: 'relax', carrierHz: 190, beatHz: 8, waveType: 'Alpha', icon: '🌊', color: 'primary', moods: ['stressed'] },
   { id: 'alpha-9', name: 'Serenity', description: '9Hz Alpha for peaceful tranquility', benefit: 'Creates a warm sense of inner peace', category: 'relax', carrierHz: 195, beatHz: 9, waveType: 'Alpha', icon: '🍃', color: 'accent', moods: ['stressed', 'tired'] },
 ];
 

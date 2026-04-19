@@ -1,8 +1,16 @@
 import { motion } from 'framer-motion';
-import { useStats } from '@/hooks/useStats';
+import {
+  AlertTriangle,
+  BarChart3,
+  Clock,
+  Flame,
+  TrendingUp,
+  Zap,
+} from 'lucide-react';
+import { Bar, BarChart, Cell, ResponsiveContainer, XAxis, YAxis } from 'recharts';
+
 import { useAuth } from '@/context/AuthContextCore';
-import { Flame, Clock, Zap, TrendingUp, AlertTriangle, BarChart3 } from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Cell } from 'recharts';
+import { useStats } from '@/hooks/useStats';
 
 function SkeletonCard() {
   return (

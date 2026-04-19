@@ -1,8 +1,12 @@
-import { useState, useEffect, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
-import { setAchievementUnlockCallback, type AchievementUnlock } from '@/hooks/useAchievementChecker';
+import { AnimatePresence, motion } from 'framer-motion';
 import { Trophy } from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
+
+import {
+  type AchievementUnlock,
+  setAchievementUnlockCallback,
+} from '@/hooks/useAchievementChecker';
 
 export default function AchievementToast() {
   const [current, setCurrent] = useState<AchievementUnlock | null>(null);
