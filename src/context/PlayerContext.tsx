@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import * as audio from '@/lib/audioEngine';
 import { BackgroundMode } from '@anuradev/capacitor-background-mode';
+import { FrequencyPreset } from '@/lib/presets';
 import { PlayerStateContext, PlayerActionsContext, PlayerState, PlayerActions } from './PlayerContextCore';
 
 export function PlayerProvider({ children }: { children: React.ReactNode }) {
@@ -184,20 +185,12 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (state.isPlaying && !bgModeEnabledRef.current) {
       bgModeEnabledRef.current = true;
-      void BackgroundMode.setSettings({
-        title: 'AuraTune',
-        text: state.preset?.name ? `Playing: ${state.preset.name}` : 'Streaming focus frequencies',
-        icon: 'ic_launcher',
-        visibility: 'public',
-        importance: 'high',
-      }).then(() => {
-        void BackgroundMode.enable();
-      });
+      void BackgroundMode.enable({});
     } else if (!state.isPlaying && bgModeEnabledRef.current) {
       bgModeEnabledRef.current = false;
       void BackgroundMode.disable();
     }
-  }, [state.isPlaying, state.preset?.name]);
+  }, [state.isPlaying]);
 
   // ── AudioContext heartbeat: resume if Android silently suspended it ──────────
   // Android can quietly suspend the WebView AudioContext even with BackgroundMode
