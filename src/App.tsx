@@ -12,6 +12,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/context/AuthContext";
 import { useAuth } from "@/context/AuthContextCore";
+import { usePlayer } from "@/context/PlayerContextCore";
 import { PlayerProvider } from "@/context/PlayerContext";
 import { ThemeProvider } from "@/context/ThemeContext";
 
@@ -49,6 +50,7 @@ function AppLoading() {
 
 function AppRoutes() {
   const { loading, user } = useAuth();
+  const { stop } = usePlayer();
   const [onboardingDone, setOnboardingDone] = useState(() => localStorage.getItem('onboarding_complete') === 'true');
   const [guestMode, setGuestMode] = useState(() => localStorage.getItem('guest_mode') === 'true');
 
@@ -64,6 +66,13 @@ function AppRoutes() {
       window.history.replaceState(null, '', window.location.pathname + window.location.search);
     }
   }, []);
+
+  // Stop audio when user logs out
+  useEffect(() => {
+    if (!user) {
+      stop();
+    }
+  }, [user, stop]);
 
   useEffect(() => {
     const handleOnboardingComplete = () => {
