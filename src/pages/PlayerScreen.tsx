@@ -69,105 +69,110 @@ export default function PlayerScreen() {
   };
 
   return (
-    <div className="min-h-screen gradient-player flex flex-col">
-      {/* Header */}
-      <div className="flex items-center justify-between px-5 pt-12 pb-4">
-        <motion.button whileTap={{ scale: 0.9 }} onTap={() => navigate('/')} className="p-2 -ml-2">
-          <ChevronDown size={24} className="text-foreground" />
-        </motion.button>
-        <span className="text-sm font-medium text-muted-foreground">{preset.waveType} Waves</span>
-        <div className="w-8" />
-      </div>
+    <>
+      <div className="min-h-screen gradient-player flex flex-col">
+        {/* Header */}
+        <div className="flex items-center justify-between px-5 pt-12 pb-4">
+          <motion.button whileTap={{ scale: 0.9 }} onTap={() => navigate('/')} className="p-2 -ml-2">
+            <ChevronDown size={24} className="text-foreground" />
+          </motion.button>
+          <span className="text-sm font-medium text-muted-foreground">{preset.waveType} Waves</span>
+          <div className="w-8" />
+        </div>
 
-      {/* Center - Progress ring & controls */}
-      <div className="flex-1 flex flex-col items-center justify-center px-5 relative">
-        {/* Animated glow behind */}
-        <motion.div
-          animate={isPlaying ? { scale: [1, 1.15, 1], opacity: [0.2, 0.5, 0.2] } : { scale: 1, opacity: 0.05 }}
-          transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-          className="absolute w-80 h-80 rounded-full bg-primary/20 blur-3xl"
-          style={{ willChange: 'transform, opacity' }}
-        />
+        {/* Center - Progress ring & controls */}
+        <div className="flex-1 flex flex-col items-center justify-center px-5">
+          {/* Animated glow behind */}
+          <motion.div
+            animate={isPlaying ? { scale: [1, 1.15, 1], opacity: [0.2, 0.5, 0.2] } : { scale: 1, opacity: 0.05 }}
+            transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+            className="absolute w-80 h-80 rounded-full bg-primary/20 blur-3xl"
+            style={{ willChange: 'transform, opacity' }}
+          />
 
-        {/* Progress ring */}
-        <div className="relative w-72 h-72 flex items-center justify-center">
-          <svg className="absolute inset-0 -rotate-90" viewBox="0 0 288 288">
-            <circle cx="144" cy="144" r="130" fill="none" stroke="hsl(var(--border))" strokeWidth="3" opacity="0.3" />
-            {timerSeconds && (
-              <motion.circle
-                cx="144" cy="144" r="130" fill="none"
-                stroke="hsl(var(--primary))"
-                strokeWidth="4"
-                strokeLinecap="round"
-                strokeDasharray={2 * Math.PI * 130}
-                strokeDashoffset={(2 * Math.PI * 130) * (1 - progress)}
-                transition={{ duration: 0.5 }}
-              />
-            )}
-          </svg>
+          {/* Progress ring */}
+          <div className="relative w-72 h-72 flex items-center justify-center">
+            <svg className="absolute inset-0 -rotate-90" viewBox="0 0 288 288">
+              <circle cx="144" cy="144" r="130" fill="none" stroke="hsl(var(--border))" strokeWidth="3" opacity="0.3" />
+              {timerSeconds && (
+                <motion.circle
+                  cx="144" cy="144" r="130" fill="none"
+                  stroke="hsl(var(--primary))"
+                  strokeWidth="4"
+                  strokeLinecap="round"
+                  strokeDasharray={2 * Math.PI * 130}
+                  strokeDashoffset={(2 * Math.PI * 130) * (1 - progress)}
+                  transition={{ duration: 0.5 }}
+                />
+              )}
+            </svg>
 
-          <div className="flex flex-col items-center z-10">
-            <div className="mb-3">
-              <BrainAnimation isPlaying={isPlaying} size={56} />
-            </div>
-            <h2 className="text-xl font-bold text-foreground">{preset.name}</h2>
-            <p className="text-sm text-muted-foreground mt-1">{preset.beatHz}Hz {preset.waveType}</p>
+            <div className="flex flex-col items-center z-10">
+              <div className="mb-3">
+                <BrainAnimation isPlaying={isPlaying} size={56} />
+              </div>
+              <h2 className="text-xl font-bold text-foreground">{preset.name}</h2>
+              <p className="text-sm text-muted-foreground mt-1">{preset.beatHz}Hz {preset.waveType}</p>
 
-            {/* Countdown or elapsed */}
-            <p className="text-3xl font-mono text-foreground mt-4 tabular-nums tracking-tight">
-              {remaining !== null ? formatTime(remaining) : formatTime(elapsed)}
-            </p>
-            {timerSeconds && (
-              <p className="text-[10px] text-muted-foreground mt-0.5">
-                {remaining !== null ? 'remaining' : `/ ${formatTime(timerSeconds)}`}
+              {/* Countdown or elapsed */}
+              <p className="text-3xl font-mono text-foreground mt-4 tabular-nums tracking-tight">
+                {remaining !== null ? formatTime(remaining) : formatTime(elapsed)}
               </p>
-            )}
+              {timerSeconds && (
+                <p className="text-[10px] text-muted-foreground mt-0.5">
+                  {remaining !== null ? 'remaining' : `/ ${formatTime(timerSeconds)}`}
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* Play controls */}
+          <div className="flex items-center gap-8 mt-10">
+            <motion.button
+              whileTap={{ scale: 0.85 }}
+              onTap={stop}
+              className="relative w-14 h-14 rounded-full glass flex items-center justify-center active:bg-muted/50"
+            >
+              <div className="absolute inset-0 z-10" />
+              <Square size={18} className="text-foreground pointer-events-none" />
+            </motion.button>
+
+            <motion.button
+              whileTap={{ scale: 0.9 }}
+              onTap={() => isPlaying ? pause() : resume()}
+              className="relative w-20 h-20 rounded-full bg-primary flex items-center justify-center glow-primary active:brightness-110"
+            >
+              <div className="absolute inset-0 z-10" />
+              <AnimatePresence mode="popLayout">
+                {isPlaying ? (
+                  <motion.div key="pause" className="pointer-events-none flex items-center justify-center" initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }} transition={{ duration: 0.15 }}>
+                    <Pause size={32} className="text-primary-foreground" />
+                  </motion.div>
+                ) : (
+                  <motion.div key="play" className="pointer-events-none flex items-center justify-center" initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }} transition={{ duration: 0.15 }}>
+                    <Play size={32} className="text-primary-foreground ml-1" />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.button>
+
+            <motion.button
+              whileTap={{ scale: 0.85 }}
+              onTap={openVolumeControls}
+              className={`relative w-14 h-14 rounded-full glass flex items-center justify-center active:bg-muted/50 ${showQuickVolume ? 'ring-2 ring-primary' : ''}`}
+            >
+              <div className="absolute inset-0 z-10" />
+              <Volume2 size={18} className="text-foreground pointer-events-none" />
+            </motion.button>
           </div>
         </div>
+      </div>
 
-        {/* Play controls */}
-        <div className="flex items-center gap-8 mt-10">
-          <motion.button
-            whileTap={{ scale: 0.85 }}
-            onTap={stop}
-            className="relative w-14 h-14 rounded-full glass flex items-center justify-center active:bg-muted/50"
-          >
-            <div className="absolute inset-0 z-10" />
-            <Square size={18} className="text-foreground pointer-events-none" />
-          </motion.button>
-
-          <motion.button
-            whileTap={{ scale: 0.9 }}
-            onTap={() => isPlaying ? pause() : resume()}
-            className="relative w-20 h-20 rounded-full bg-primary flex items-center justify-center glow-primary active:brightness-110"
-          >
-            <div className="absolute inset-0 z-10" />
-            <AnimatePresence mode="popLayout">
-              {isPlaying ? (
-                <motion.div key="pause" className="pointer-events-none flex items-center justify-center" initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }} transition={{ duration: 0.15 }}>
-                  <Pause size={32} className="text-primary-foreground" />
-                </motion.div>
-              ) : (
-                <motion.div key="play" className="pointer-events-none flex items-center justify-center" initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }} transition={{ duration: 0.15 }}>
-                  <Play size={32} className="text-primary-foreground ml-1" />
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </motion.button>
-
-          <motion.button
-            whileTap={{ scale: 0.85 }}
-            onTap={openVolumeControls}
-            className={`relative w-14 h-14 rounded-full glass flex items-center justify-center active:bg-muted/50 ${showQuickVolume ? 'ring-2 ring-primary' : ''}`}
-          >
-            <div className="absolute inset-0 z-10" />
-            <Volume2 size={18} className="text-foreground pointer-events-none" />
-          </motion.button>
-        </div>
-
-        <AnimatePresence>
-          {showQuickVolume && (
-            <>
+      {/* Settings popup — rendered OUTSIDE the player div so fixed positioning is always viewport-relative */}
+      <AnimatePresence>
+        {showQuickVolume && (
+          <>
+            {/* Backdrop */}
             <motion.button
               type="button"
               aria-label="Close controls"
@@ -175,15 +180,35 @@ export default function PlayerScreen() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setShowQuickVolume(false)}
-              className="absolute inset-0 bg-black/40 backdrop-blur-sm z-30 rounded-[2rem]"
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-30"
             />
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100%-2rem)] max-w-sm max-h-[75vh] overflow-y-auto glass-heavy border-primary/20 rounded-[2.5rem] px-6 py-8 shadow-2xl z-40 transition-all"
+
+            {/* Centered modal — outer div handles centering, inner handles animation to avoid framer-motion transform conflicts */}
+            <div
+              style={{
+                position: 'fixed',
+                inset: 0,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                zIndex: 40,
+                pointerEvents: 'none',
+              }}
             >
-              <div className="flex gap-1 mb-4 bg-muted/30 rounded-xl p-1">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.92 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.92 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 28 }}
+                style={{
+                  width: 'min(calc(100vw - 2rem), 420px)',
+                  maxHeight: '85vh',
+                  pointerEvents: 'auto',
+                }}
+                className="overflow-y-auto glass-heavy rounded-[2rem] px-6 py-6 shadow-2xl"
+              >
+              {/* Tab switcher */}
+              <div className="flex gap-1 mb-5 bg-muted/30 rounded-xl p-1">
                 <button
                   onClick={() => setSettingsTab('sound')}
                   className={`flex-1 py-2 rounded-lg text-xs font-semibold transition-all flex items-center justify-center gap-1.5 ${
@@ -339,10 +364,10 @@ export default function PlayerScreen() {
                 </div>
               )}
             </motion.div>
-            </>
-          )}
-        </AnimatePresence>
-      </div>
-    </div>
+            </div>
+          </>
+        )}
+      </AnimatePresence>
+    </>
   );
 }
