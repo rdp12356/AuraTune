@@ -15,6 +15,7 @@ export default function PlayerScreen() {
   } = usePlayerActions();
   const navigate = useNavigate();
   const [showSettings, setShowSettings] = useState(false);
+  const [showQuickVolume, setShowQuickVolume] = useState(false);
   const [settingsTab, setSettingsTab] = useState<'sound' | 'timer'>('sound');
   const [customHours, setCustomHours] = useState('0');
   const [customMinutes, setCustomMinutes] = useState('25');
@@ -44,6 +45,19 @@ export default function PlayerScreen() {
   const applyCustomTimer = () => {
     const totalSecs = (parseInt(customHours || '0') * 3600) + (parseInt(customMinutes || '0') * 60);
     if (totalSecs > 0) setTimer(totalSecs);
+  };
+
+  const applyVolume = (value: string) => {
+    setVolume(parseFloat(value));
+  };
+
+  const applyBgVolume = (value: string) => {
+    setBgVolume(parseFloat(value));
+  };
+
+  const openVolumeControls = () => {
+    setShowQuickVolume(v => !v);
+    // Remove automatic drawer opening to prevent "scrolling" confusion
   };
 
   return (
@@ -135,13 +149,46 @@ export default function PlayerScreen() {
 
           <motion.button
             whileTap={{ scale: 0.85 }}
-            onTap={() => setShowSettings(s => !s)}
+            onTap={openVolumeControls}
             className={`relative w-14 h-14 rounded-full glass flex items-center justify-center active:bg-muted/50 ${showSettings ? 'ring-2 ring-primary' : ''}`}
           >
             <div className="absolute inset-0 z-10" />
             <Volume2 size={18} className="text-foreground pointer-events-none" />
           </motion.button>
         </div>
+
+        <AnimatePresence>
+          {showQuickVolume && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 10 }}
+              className="mt-6 w-full max-w-[280px] glass rounded-2xl px-5 py-4 shadow-2xl z-20"
+            >
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <Volume2 size={14} className="text-primary" />
+                  <span className="text-xs font-bold text-foreground">Volume</span>
+                </div>
+                <span className="text-xs font-mono text-primary">{Math.round(volume * 100)}%</span>
+              </div>
+              <input
+                type="range"
+                min="0"
+                max="1"
+                step="0.01"
+                value={volume}
+                onInput={e => applyVolume((e.target as HTMLInputElement).value)}
+                onChange={e => applyVolume(e.target.value)}
+                className="w-full h-1.5 bg-muted rounded-full appearance-none cursor-pointer accent-primary"
+              />
+              <div className="flex justify-between mt-2 px-0.5">
+                <span className="text-[9px] text-muted-foreground">Mute</span>
+                <span className="text-[9px] text-muted-foreground">Max</span>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       {/* Settings panel */}
@@ -182,7 +229,8 @@ export default function PlayerScreen() {
                   <input
                     type="range" min="0" max="1" step="0.01"
                     value={volume}
-                    onChange={e => setVolume(parseFloat(e.target.value))}
+                    onInput={e => applyVolume((e.target as HTMLInputElement).value)}
+                    onChange={e => applyVolume(e.target.value)}
                     className="w-full accent-primary"
                   />
                 </div>
@@ -207,7 +255,8 @@ export default function PlayerScreen() {
                     <input
                       type="range" min="0" max="1" step="0.01"
                       value={bgVolume}
-                      onChange={e => setBgVolume(parseFloat(e.target.value))}
+                      onInput={e => applyBgVolume((e.target as HTMLInputElement).value)}
+                      onChange={e => applyBgVolume(e.target.value)}
                       className="w-full accent-primary mt-3"
                     />
                   )}
