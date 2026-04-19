@@ -145,6 +145,10 @@
     @apply bg-card/60 backdrop-blur-xl border border-border/50;
   }
 
+  .glass-heavy {
+    @apply bg-card/90 backdrop-blur-2xl border border-border/50;
+  }
+
   .glow-primary {
     box-shadow: 0 0 30px -5px hsl(var(--primary) / 0.4);
   }
