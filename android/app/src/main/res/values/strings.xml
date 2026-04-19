@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">FrequencyFlow</string>
-    <string name="title_activity_main">FrequencyFlow</string>
-    <string name="package_name">com.frequency.flow</string>
-    <string name="custom_url_scheme">com.frequency.flow</string>
+    <string name="app_name">AuraTune</string>
+    <string name="title_activity_main">AuraTune</string>
+    <string name="package_name">com.auratune.app</string>
+    <string name="custom_url_scheme">com.auratune.app</string>
 </resources>

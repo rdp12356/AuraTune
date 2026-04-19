@@ -15,6 +15,10 @@ let bgNoiseSource: AudioBufferSourceNode | null = null;
 let bgGain: GainNode | null = null;
 let isPlaying = false;
 
+// Keepalive: a silent 1-sample looping buffer that prevents Android's battery
+// optimizer from suspending the AudioContext ~30s after the screen turns off.
+let keepaliveSource: AudioBufferSourceNode | null = null;
+
 const FADE_DURATION = 0.1; // 100ms fade for smoothness
 const FREQUENCY_LOUDNESS_BOOST = 1.55;
 
@@ -25,9 +29,28 @@ function getBoostedFrequencyVolume(volume: number) {
 // Cache for generated noise buffers
 const noiseBufferCache = new Map<string, AudioBuffer>();
 
+function startKeepalive(ctx: AudioContext) {
+  stopKeepalive();
+  const silentBuffer = ctx.createBuffer(1, 1, ctx.sampleRate);
+  keepaliveSource = ctx.createBufferSource();
+  keepaliveSource.buffer = silentBuffer;
+  keepaliveSource.loop = true;
+  keepaliveSource.connect(ctx.destination);
+  keepaliveSource.start();
+}
+
+function stopKeepalive() {
+  try {
+    keepaliveSource?.stop();
+    keepaliveSource?.disconnect();
+  } catch {}
+  keepaliveSource = null;
+}
+
 function getOrCreateContext(): AudioContext {
-  if (!audioCtx) {
+  if (!audioCtx || audioCtx.state === 'closed') {
     audioCtx = new AudioContext();
+    startKeepalive(audioCtx);
   }
   if (audioCtx.state === 'suspended') {
     void audioCtx.resume();
@@ -37,6 +60,12 @@ function getOrCreateContext(): AudioContext {
 
 export async function resumeAudioContext() {
   if (!audioCtx) return;
+  if (audioCtx.state === 'closed') {
+    // Context was closed — recreate it. Playback must be restarted by the caller.
+    audioCtx = new AudioContext();
+    startKeepalive(audioCtx);
+    return;
+  }
   if (audioCtx.state === 'suspended') {
     try {
       await audioCtx.resume();
@@ -59,7 +88,7 @@ export function startBinauralBeat(carrierHz: number, beatHz: number, volume: num
   outputCompressor.ratio.value = 12;
   outputCompressor.attack.value = 0.003;
   outputCompressor.release.value = 0.25;
-  
+
   // Start with 0 volume and ramp up
   masterGain.gain.setValueAtTime(0, ctx.currentTime);
   masterGain.gain.linearRampToValueAtTime(getBoostedFrequencyVolume(volume), ctx.currentTime + FADE_DURATION);
@@ -82,26 +111,35 @@ export function startBinauralBeat(carrierHz: number, beatHz: number, volume: num
   rightOsc.connect(rightGain);
   rightGain.connect(merger, 0, 1);
 
-  // Speaker-friendly layer: a center carrier with beat-rate amplitude modulation.
-  // This makes the beat perceptible without headphones while keeping binaural stereo cues.
+  // ─── Mono-compatible layer ─────────────────────────────────────────────────
+  // On mono speakers / earbuds / some Bluetooth devices, the ChannelMergerNode
+  // downmixes by summing both channels. When Left=sin(f) and Right=sin(f+Δ) are
+  // summed, the binaural beat effect is LOST and volume is reduced.
+  //
+  // We add a centre oscillator at the midpoint frequency, amplitude-modulated
+  // at the beat rate. This is audible on EVERY device and provides a
+  // psychoacoustic entrainment cue even without headphones.
+  //
+  // Gains boosted (0.65 / 0.45 vs old 0.36 / 0.22) so it is clearly audible.
   centerOsc = ctx.createOscillator();
   centerOsc.type = 'sine';
   centerOsc.frequency.value = carrierHz + (beatHz / 2);
 
   centerGain = ctx.createGain();
-  centerGain.gain.value = 0.36;
+  centerGain.gain.value = 0.65;
 
   beatLfo = ctx.createOscillator();
   beatLfo.type = 'sine';
   beatLfo.frequency.value = Math.max(0.5, Math.abs(beatHz));
 
   beatLfoDepth = ctx.createGain();
-  beatLfoDepth.gain.value = 0.22;
+  beatLfoDepth.gain.value = 0.45;
 
   beatLfo.connect(beatLfoDepth);
   beatLfoDepth.connect(centerGain.gain);
   centerOsc.connect(centerGain);
   centerGain.connect(masterGain);
+  // ──────────────────────────────────────────────────────────────────────────
 
   merger.connect(masterGain);
   masterGain.connect(outputCompressor);
@@ -217,7 +255,7 @@ function generateNoiseBuffer(ctx: AudioContext, type: string): AudioBuffer {
       data[i] = sample;
     }
   }
-  
+
   noiseBufferCache.set(type, buffer);
   return buffer;
 }

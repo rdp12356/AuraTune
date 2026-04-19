@@ -161,6 +161,8 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     play, pause, resume, stop, setVolume, setBgSound, setBgVolume, setTimer
   }), [play, pause, resume, stop, setVolume, setBgSound, setBgVolume, setTimer]);
 
+  const bgModeEnabledRef = useRef(false);
+
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible' && stateRef.current.isPlaying) {
@@ -172,16 +174,41 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     document.addEventListener('visibilitychange', handleVisibilityChange);
     window.addEventListener('pageshow', handleVisibilityChange);
 
-    // Initialize background mode when playing
-    if (state.isPlaying) {
-      void BackgroundMode.enable();
-    }
-
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       window.removeEventListener('pageshow', handleVisibilityChange);
     };
-  }, [syncElapsed, state.isPlaying]);
+  }, [syncElapsed]);
+
+  // ── Background mode: enable ONCE when playback starts, disable ONCE when it stops ──
+  useEffect(() => {
+    if (state.isPlaying && !bgModeEnabledRef.current) {
+      bgModeEnabledRef.current = true;
+      void BackgroundMode.setSettings({
+        title: 'AuraTune',
+        text: state.preset?.name ? `Playing: ${state.preset.name}` : 'Streaming focus frequencies',
+        icon: 'ic_launcher',
+        visibility: 'public',
+        importance: 'high',
+      }).then(() => {
+        void BackgroundMode.enable();
+      });
+    } else if (!state.isPlaying && bgModeEnabledRef.current) {
+      bgModeEnabledRef.current = false;
+      void BackgroundMode.disable();
+    }
+  }, [state.isPlaying, state.preset?.name]);
+
+  // ── AudioContext heartbeat: resume if Android silently suspended it ──────────
+  // Android can quietly suspend the WebView AudioContext even with BackgroundMode
+  // enabled. Polling every 8s and resuming it keeps audio alive.
+  useEffect(() => {
+    if (!state.isPlaying) return;
+    const heartbeat = setInterval(() => {
+      audio.resumeAudioContext();
+    }, 8000);
+    return () => clearInterval(heartbeat);
+  }, [state.isPlaying]);
 
   useEffect(() => {
     return () => {

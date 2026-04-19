@@ -48,4 +48,6 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
+    <!-- Required on Android 13+ for the background playback notification -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 </manifest>
