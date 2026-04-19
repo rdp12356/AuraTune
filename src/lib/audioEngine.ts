@@ -26,17 +26,27 @@ function getBoostedFrequencyVolume(volume: number) {
   return Math.min(1, volume * FREQUENCY_LOUDNESS_BOOST);
 }
 
+// Polyfill for older Android WebViews (Android 7 and below)
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const AudioContextClass: typeof AudioContext = (window as any).AudioContext || (window as any).webkitAudioContext;
+
 // Cache for generated noise buffers
 const noiseBufferCache = new Map<string, AudioBuffer>();
 
 function startKeepalive(ctx: AudioContext) {
   stopKeepalive();
-  const silentBuffer = ctx.createBuffer(1, 1, ctx.sampleRate);
-  keepaliveSource = ctx.createBufferSource();
-  keepaliveSource.buffer = silentBuffer;
-  keepaliveSource.loop = true;
-  keepaliveSource.connect(ctx.destination);
-  keepaliveSource.start();
+  try {
+    // Some old WebViews reject 1-sample buffers; use 2 samples to be safe
+    const silentBuffer = ctx.createBuffer(1, 2, ctx.sampleRate);
+    keepaliveSource = ctx.createBufferSource();
+    keepaliveSource.buffer = silentBuffer;
+    keepaliveSource.loop = true;
+    keepaliveSource.connect(ctx.destination);
+    keepaliveSource.start(0);
+  } catch {
+    // Keepalive not supported — audio may stop in background on old devices
+    keepaliveSource = null;
+  }
 }
 
 function stopKeepalive() {
@@ -48,12 +58,14 @@ function stopKeepalive() {
 }
 
 function getOrCreateContext(): AudioContext {
-  if (!audioCtx || audioCtx.state === 'closed') {
-    audioCtx = new AudioContext();
+  const isClosed = audioCtx && audioCtx.state === 'closed';
+  if (!audioCtx || isClosed) {
+    audioCtx = new AudioContextClass();
     startKeepalive(audioCtx);
   }
+  // state can be undefined on very old WebViews — guard with optional chaining
   if (audioCtx.state === 'suspended') {
-    void audioCtx.resume();
+    void audioCtx.resume().catch(() => {});
   }
   return audioCtx;
 }
@@ -61,8 +73,7 @@ function getOrCreateContext(): AudioContext {
 export async function resumeAudioContext() {
   if (!audioCtx) return;
   if (audioCtx.state === 'closed') {
-    // Context was closed — recreate it. Playback must be restarted by the caller.
-    audioCtx = new AudioContext();
+    audioCtx = new AudioContextClass();
     startKeepalive(audioCtx);
     return;
   }
