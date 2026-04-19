@@ -25,6 +25,17 @@ export default function PlayerScreen() {
     }
   }, [navigate, preset]);
 
+  useEffect(() => {
+    if (!showQuickVolume) return;
+
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+    };
+  }, [showQuickVolume]);
+
   if (!preset) {
     return null;
   }
@@ -39,7 +50,6 @@ export default function PlayerScreen() {
 
   const remaining = timerSeconds ? Math.max(timerSeconds - elapsed, 0) : null;
   const progress = timerSeconds ? Math.min(elapsed / timerSeconds, 1) : 0;
-  const circumference = 2 * Math.PI * 120;
 
   const applyCustomTimer = () => {
     const totalSecs = (parseInt(customHours || '0') * 3600) + (parseInt(customMinutes || '0') * 60);
@@ -57,17 +67,6 @@ export default function PlayerScreen() {
   const openVolumeControls = () => {
     setShowQuickVolume(v => !v);
   };
-
-  useEffect(() => {
-    if (!showQuickVolume) return;
-
-    const originalOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-
-    return () => {
-      document.body.style.overflow = originalOverflow;
-    };
-  }, [showQuickVolume]);
 
   return (
     <div className="min-h-screen gradient-player flex flex-col">
