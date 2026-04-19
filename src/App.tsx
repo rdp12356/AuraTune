@@ -16,6 +16,7 @@ import { PlayerProvider } from "@/context/PlayerContext";
 import { ThemeProvider } from "@/context/ThemeContext";
 
 const AuthScreen = lazy(() => import("./pages/AuthScreen"));
+const AuthCallbackScreen = lazy(() => import("./pages/AuthCallbackScreen"));
 const HomeScreen = lazy(() => import("./pages/HomeScreen"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const OnboardingScreen = lazy(() => import("./pages/OnboardingScreen"));
@@ -89,6 +90,8 @@ function AppRoutes() {
       <Routes>
         {/* Reset password always accessible regardless of auth state */}
         <Route path="/reset-password" element={<ResetPasswordScreen />} />
+        {/* OAuth callback route for deterministic auth completion */}
+        <Route path="/auth/callback" element={<AuthCallbackScreen />} />
 
         {/* Guarded Routes */}
         {!onboardingDone ? (

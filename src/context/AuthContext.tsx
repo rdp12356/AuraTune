@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Capacitor } from '@capacitor/core';
 import { supabase } from '@/integrations/supabase/client';
 import type { User, Session } from '@supabase/supabase-js';
 import { AuthContext } from './AuthContextCore';
@@ -51,12 +52,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signInWithGoogle = async (): Promise<{ error: Error | null }> => {
+    const redirectTo = Capacitor.isNativePlatform()
+      ? 'com.auratune.app://auth/callback'
+      : `${window.location.origin}/auth/callback`;
+
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: window.location.origin.includes('localhost') 
-          ? window.location.origin 
-          : 'com.auratune.app://google-auth',
+        redirectTo,
       },
     });
     return { error: error as Error | null };

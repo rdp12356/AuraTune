@@ -3,14 +3,16 @@ import { Music, Pause, Play } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import { usePlayer } from '@/context/PlayerContextCore';
+import { useAuth } from '@/context/AuthContextCore';
 
 export default function MiniPlayer() {
   const location = useLocation();
   const navigate = useNavigate();
   const { preset, isPlaying, play, pause, resume } = usePlayer();
+  const { user } = useAuth();
 
   const hiddenRoutes = ['/player', '/onboarding', '/auth', '/reset-password'];
-  const isHidden = !preset || hiddenRoutes.includes(location.pathname);
+  const isHidden = !preset || !user || hiddenRoutes.includes(location.pathname);
 
   if (isHidden) return null;
 

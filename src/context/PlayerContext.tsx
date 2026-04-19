@@ -1,7 +1,8 @@
 import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
+import { Capacitor } from '@capacitor/core';
 import * as audio from '@/lib/audioEngine';
 import { BackgroundMode } from '@anuradev/capacitor-background-mode';
-import { FrequencyPreset } from '@/lib/presets';
+import { backgroundSounds, FrequencyPreset } from '@/lib/presets';
 import { PlayerStateContext, PlayerActionsContext, PlayerState, PlayerActions } from './PlayerContextCore';
 
 export function PlayerProvider({ children }: { children: React.ReactNode }) {
@@ -24,6 +25,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
   const playbackStartedAtRef = useRef<number | null>(null);
   const elapsedBeforePlaybackRef = useRef(0);
   const timerSecondsRef = useRef<number | null>(null);
+  const isAndroidRef = useRef(Capacitor.getPlatform() === 'android');
 
   useEffect(() => {
     timerSecondsRef.current = state.timerSeconds;
@@ -43,6 +45,78 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
       intervalRef.current = null;
     }
   }, []);
+
+  const formatDuration = useCallback((seconds: number) => {
+    const safeSeconds = Math.max(0, Math.floor(seconds));
+    const hours = Math.floor(safeSeconds / 3600);
+    const minutes = Math.floor((safeSeconds % 3600) / 60);
+    const remainingSeconds = safeSeconds % 60;
+
+    if (hours > 0) {
+      return `${hours}h ${minutes}m`;
+    }
+
+    if (minutes > 0) {
+      return `${minutes}m ${remainingSeconds}s`;
+    }
+
+    return `${remainingSeconds}s`;
+  }, []);
+
+  const buildNotificationSettings = useCallback(() => {
+    const currentState = stateRef.current;
+    const presetName = currentState.preset?.name ?? 'Listening session';
+    const bgSoundName = backgroundSounds.find(sound => sound.id === currentState.bgSound)?.name ?? 'None';
+    const timerLabel = currentState.timerSeconds !== null ? `Timer ${formatDuration(currentState.timerSeconds)}` : 'No timer';
+    const elapsedLabel = currentState.elapsed > 0 ? `Elapsed ${formatDuration(currentState.elapsed)}` : 'Ready to play';
+
+    return {
+      title: 'AuraTune',
+      text: `Now playing: ${presetName}`,
+      subText: `${bgSoundName} background · ${timerLabel} · ${elapsedLabel}`,
+      bigText: true,
+      resume: true,
+      silent: false,
+      hidden: false,
+      color: '0F172A',
+      icon: 'ic_notification_audio',
+      channelName: 'AuraTune Playback',
+      channelDescription: 'Keeps AuraTune active while audio plays',
+      allowClose: true,
+      closeIcon: 'ic_notification_close',
+      closeTitle: 'Stop',
+      showWhen: true,
+      visibility: 'public' as const,
+      disableWebViewOptimization: false,
+    };
+  }, [formatDuration]);
+
+  const syncBackgroundNotification = useCallback(async () => {
+    if (!isAndroidRef.current || typeof document === 'undefined') {
+      return;
+    }
+
+    try {
+      const permissionStatus = await BackgroundMode.checkNotificationsPermission();
+      if (permissionStatus.notifications !== 'granted') {
+        const requestedStatus = await BackgroundMode.requestNotificationsPermission();
+        if (requestedStatus.notifications !== 'granted') {
+          return;
+        }
+      }
+
+      const notificationSettings = buildNotificationSettings();
+
+      if (!bgModeEnabledRef.current) {
+        bgModeEnabledRef.current = true;
+        await BackgroundMode.enable(notificationSettings);
+      } else {
+        await BackgroundMode.updateNotification(notificationSettings);
+      }
+    } catch {
+      // Background notifications are best effort; playback continues if they fail.
+    }
+  }, [buildNotificationSettings]);
 
   const syncElapsed = useCallback(() => {
     const elapsed = getElapsedSeconds();
@@ -184,13 +258,65 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
   // ── Background mode: enable ONCE when playback starts, disable ONCE when it stops ──
   useEffect(() => {
     if (state.isPlaying && !bgModeEnabledRef.current) {
-      bgModeEnabledRef.current = true;
-      void BackgroundMode.enable({});
+      void syncBackgroundNotification();
     } else if (!state.isPlaying && bgModeEnabledRef.current) {
       bgModeEnabledRef.current = false;
       void BackgroundMode.disable();
     }
-  }, [state.isPlaying]);
+  }, [state.isPlaying, syncBackgroundNotification]);
+
+  useEffect(() => {
+    if (!state.isPlaying || !bgModeEnabledRef.current) {
+      return;
+    }
+
+    void syncBackgroundNotification();
+  }, [state.preset, state.bgSound, state.timerSeconds, state.elapsed, state.isPlaying, syncBackgroundNotification]);
+
+  useEffect(() => {
+    if (typeof navigator === 'undefined' || !('mediaSession' in navigator)) {
+      return;
+    }
+
+    const session = navigator.mediaSession;
+    const current = stateRef.current;
+    const bgSoundName = backgroundSounds.find(sound => sound.id === current.bgSound)?.name ?? 'None';
+
+    if (current.preset) {
+      session.metadata = new MediaMetadata({
+        title: current.preset.name,
+        artist: 'AuraTune',
+        album: `${current.preset.waveType} • ${bgSoundName}`,
+        artwork: [
+          { src: '/logo-192.png', sizes: '192x192', type: 'image/png' },
+          { src: '/logo.png', sizes: '512x512', type: 'image/png' },
+        ],
+      });
+    }
+
+    session.playbackState = current.isPlaying ? 'playing' : 'paused';
+
+    const safeSetActionHandler = (
+      action: MediaSessionAction,
+      handler: MediaSessionActionHandler | null,
+    ) => {
+      try {
+        session.setActionHandler(action, handler);
+      } catch {
+        // Some platforms do not support every action.
+      }
+    };
+
+    safeSetActionHandler('play', () => resume());
+    safeSetActionHandler('pause', () => pause());
+    safeSetActionHandler('stop', () => stop());
+
+    return () => {
+      safeSetActionHandler('play', null);
+      safeSetActionHandler('pause', null);
+      safeSetActionHandler('stop', null);
+    };
+  }, [state.isPlaying, state.preset, state.bgSound, pause, resume, stop]);
 
   // ── AudioContext heartbeat: resume if Android silently suspended it ──────────
   // Android can quietly suspend the WebView AudioContext even with BackgroundMode
@@ -208,6 +334,12 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
       audio.stopAll();
       clearTimer();
       playbackStartedAtRef.current = null;
+
+      if (typeof navigator !== 'undefined' && 'mediaSession' in navigator) {
+        const session = navigator.mediaSession;
+        session.playbackState = 'none';
+        session.metadata = null;
+      }
     };
   }, [clearTimer]);
 
