@@ -7,9 +7,9 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
   const [state, setState] = useState<PlayerState>({
     preset: null,
     isPlaying: false,
-    volume: 0.5,
+    volume: 0.68,
     bgSound: 'none',
-    bgVolume: 0.3,
+    bgVolume: 0.55,
     timerSeconds: null,
     elapsed: 0,
   });

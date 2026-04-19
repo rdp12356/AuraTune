@@ -1,7 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { usePlayerState, usePlayerActions } from '@/context/PlayerContextCore';
 import { useNavigate } from 'react-router-dom';
-import { Play, Pause, Square, ChevronDown, Volume2, Timer, Brain, Zap, Moon } from 'lucide-react';
+import { Play, Pause, Square, ChevronDown, Volume2, Timer, Brain, Moon } from 'lucide-react';
 import { backgroundSounds, timerPresets, smartRoutines } from '@/lib/presets';
 import { useEffect, useState } from 'react';
 import BrainAnimation from '@/components/BrainAnimation';
@@ -14,7 +14,6 @@ export default function PlayerScreen() {
     pause, resume, stop, setVolume, setBgSound, setBgVolume, setTimer,
   } = usePlayerActions();
   const navigate = useNavigate();
-  const [showSettings, setShowSettings] = useState(false);
   const [showQuickVolume, setShowQuickVolume] = useState(false);
   const [settingsTab, setSettingsTab] = useState<'sound' | 'timer'>('sound');
   const [customHours, setCustomHours] = useState('0');
@@ -57,8 +56,18 @@ export default function PlayerScreen() {
 
   const openVolumeControls = () => {
     setShowQuickVolume(v => !v);
-    // Remove automatic drawer opening to prevent "scrolling" confusion
   };
+
+  useEffect(() => {
+    if (!showQuickVolume) return;
+
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+    };
+  }, [showQuickVolume]);
 
   return (
     <div className="min-h-screen gradient-player flex flex-col">
@@ -150,7 +159,7 @@ export default function PlayerScreen() {
           <motion.button
             whileTap={{ scale: 0.85 }}
             onTap={openVolumeControls}
-            className={`relative w-14 h-14 rounded-full glass flex items-center justify-center active:bg-muted/50 ${showSettings ? 'ring-2 ring-primary' : ''}`}
+            className={`relative w-14 h-14 rounded-full glass flex items-center justify-center active:bg-muted/50 ${showQuickVolume ? 'ring-2 ring-primary' : ''}`}
           >
             <div className="absolute inset-0 z-10" />
             <Volume2 size={18} className="text-foreground pointer-events-none" />
@@ -159,196 +168,182 @@ export default function PlayerScreen() {
 
         <AnimatePresence>
           {showQuickVolume && (
+            <>
+            <motion.button
+              type="button"
+              aria-label="Close controls"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowQuickVolume(false)}
+              className="fixed inset-0 bg-black/35 z-30"
+            />
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 10 }}
-              className="mt-6 w-full max-w-[280px] glass rounded-2xl px-5 py-4 shadow-2xl z-20"
+              className="fixed left-1/2 -translate-x-1/2 bottom-5 w-[calc(100%-1.5rem)] max-w-[360px] max-h-[70vh] overflow-y-auto glass rounded-2xl px-5 py-4 shadow-2xl z-40"
             >
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-2">
-                  <Volume2 size={14} className="text-primary" />
-                  <span className="text-xs font-bold text-foreground">Volume</span>
+              <div className="flex gap-1 mb-4 bg-muted/30 rounded-xl p-1">
+                <button
+                  onClick={() => setSettingsTab('sound')}
+                  className={`flex-1 py-2 rounded-lg text-xs font-semibold transition-all flex items-center justify-center gap-1.5 ${
+                    settingsTab === 'sound' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground'
+                  }`}
+                >
+                  <Volume2 size={14} /> Sound
+                </button>
+                <button
+                  onClick={() => setSettingsTab('timer')}
+                  className={`flex-1 py-2 rounded-lg text-xs font-semibold transition-all flex items-center justify-center gap-1.5 ${
+                    settingsTab === 'timer' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground'
+                  }`}
+                >
+                  <Timer size={14} /> Timer
+                </button>
+              </div>
+
+              {settingsTab === 'sound' && (
+                <div className="space-y-4">
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs font-medium text-muted-foreground">Frequency Volume</span>
+                      <span className="text-xs font-mono text-primary">{Math.round(volume * 100)}%</span>
+                    </div>
+                    <input
+                      type="range"
+                      min="0"
+                      max="1"
+                      step="0.01"
+                      value={volume}
+                      onInput={e => applyVolume((e.target as HTMLInputElement).value)}
+                      onChange={e => applyVolume(e.target.value)}
+                      className="w-full h-1.5 bg-muted rounded-full appearance-none cursor-pointer accent-primary"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground mb-2 block">Background Sound</label>
+                    <div className="flex gap-2 flex-wrap">
+                      {backgroundSounds.map(s => (
+                        <motion.button
+                          key={s.id}
+                          whileTap={{ scale: 0.95 }}
+                          onTap={() => setBgSound(s.id)}
+                          className={`px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition-all ${
+                            bgSound === s.id ? 'bg-primary text-primary-foreground' : 'glass text-muted-foreground'
+                          }`}
+                        >
+                          {s.icon} {s.name}
+                        </motion.button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {bgSound !== 'none' && (
+                    <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-xs font-medium text-muted-foreground">Background Volume</span>
+                        <span className="text-xs font-mono text-primary">{Math.round(bgVolume * 100)}%</span>
+                      </div>
+                      <input
+                        type="range"
+                        min="0"
+                        max="1"
+                        step="0.01"
+                        value={bgVolume}
+                        onInput={e => applyBgVolume((e.target as HTMLInputElement).value)}
+                        onChange={e => applyBgVolume(e.target.value)}
+                        className="w-full h-1.5 bg-muted rounded-full appearance-none cursor-pointer accent-primary"
+                      />
+                    </div>
+                  )}
                 </div>
-                <span className="text-xs font-mono text-primary">{Math.round(volume * 100)}%</span>
-              </div>
-              <input
-                type="range"
-                min="0"
-                max="1"
-                step="0.01"
-                value={volume}
-                onInput={e => applyVolume((e.target as HTMLInputElement).value)}
-                onChange={e => applyVolume(e.target.value)}
-                className="w-full h-1.5 bg-muted rounded-full appearance-none cursor-pointer accent-primary"
-              />
-              <div className="flex justify-between mt-2 px-0.5">
-                <span className="text-[9px] text-muted-foreground">Mute</span>
-                <span className="text-[9px] text-muted-foreground">Max</span>
-              </div>
+              )}
+
+              {settingsTab === 'timer' && (
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground mb-2 block">Quick Timer</label>
+                    <div className="grid grid-cols-3 gap-2">
+                      {timerPresets.map(opt => (
+                        <motion.button key={opt.label} whileTap={{ scale: 0.92 }} onTap={() => setTimer(opt.value)}
+                          className={`py-2 rounded-xl text-[11px] font-medium transition-all flex flex-col items-center ${
+                            timerSeconds === opt.value
+                              ? 'bg-primary text-primary-foreground'
+                              : 'glass text-muted-foreground'
+                          }`}
+                        >
+                          <span className="font-semibold">{opt.label}</span>
+                        </motion.button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground mb-2 block">Custom Timer</label>
+                    <div className="flex gap-2 items-end">
+                      <div className="flex-1 glass rounded-xl px-3 py-2.5">
+                        <label className="text-[9px] text-muted-foreground">Hours</label>
+                        <input
+                          type="number"
+                          value={customHours}
+                          onChange={e => setCustomHours(e.target.value)}
+                          className="w-full bg-transparent text-foreground text-lg font-semibold outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                          min="0"
+                          max="12"
+                        />
+                      </div>
+                      <div className="flex-1 glass rounded-xl px-3 py-2.5">
+                        <label className="text-[9px] text-muted-foreground">Minutes</label>
+                        <input
+                          type="number"
+                          value={customMinutes}
+                          onChange={e => setCustomMinutes(e.target.value)}
+                          className="w-full bg-transparent text-foreground text-lg font-semibold outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                          min="0"
+                          max="59"
+                        />
+                      </div>
+                      <motion.button whileTap={{ scale: 0.92 }} onTap={applyCustomTimer}
+                        className="bg-primary text-primary-foreground px-3 py-3 rounded-xl text-xs font-semibold"
+                      >
+                        Set
+                      </motion.button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground mb-2 block">Smart Routines</label>
+                    <div className="space-y-2 max-h-36 overflow-auto pr-1">
+                      {smartRoutines.map(routine => (
+                        <motion.button key={routine.id} whileTap={{ scale: 0.97 }} onTap={() => setTimer(routine.focusMinutes * 60)}
+                          className={`w-full flex items-center gap-3 p-2.5 rounded-xl transition-all ${
+                            timerSeconds === routine.focusMinutes * 60
+                              ? 'bg-primary/10 border border-primary/30'
+                              : 'glass'
+                          }`}
+                        >
+                          <span className="text-xl">
+                            {routine.id === 'pomodoro' ? <Timer size={18} className="text-destructive" /> :
+                             routine.id === 'deep-work' ? <Brain size={18} className="text-primary" /> :
+                             <Moon size={18} className="text-warm" />}
+                          </span>
+                          <div className="flex-1 text-left">
+                            <p className="text-xs font-semibold text-foreground">{routine.name}</p>
+                            <p className="text-[10px] text-muted-foreground">{routine.description}</p>
+                          </div>
+                        </motion.button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
             </motion.div>
+            </>
           )}
         </AnimatePresence>
       </div>
-
-      {/* Settings panel */}
-      <AnimatePresence>
-        {showSettings && (
-          <motion.div
-            initial={{ y: 300, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: 300, opacity: 0 }}
-            transition={{ type: 'spring', damping: 25 }}
-            className="glass rounded-t-3xl px-5 pt-4 pb-8"
-          >
-            {/* Tabs */}
-            <div className="flex gap-1 mb-4 bg-muted/30 rounded-xl p-1">
-              <button
-                onClick={() => setSettingsTab('sound')}
-                className={`flex-1 py-2 rounded-lg text-xs font-semibold transition-all flex items-center justify-center gap-1.5 ${
-                  settingsTab === 'sound' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground'
-                }`}
-              >
-                <Volume2 size={14} /> Sound
-              </button>
-              <button
-                onClick={() => setSettingsTab('timer')}
-                className={`flex-1 py-2 rounded-lg text-xs font-semibold transition-all flex items-center justify-center gap-1.5 ${
-                  settingsTab === 'timer' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground'
-                }`}
-              >
-                <Timer size={14} /> Timer
-              </button>
-            </div>
-
-            {settingsTab === 'sound' && (
-              <div className="space-y-5">
-                {/* Volume */}
-                <div>
-                  <label className="text-xs font-medium text-muted-foreground mb-2 block">Frequency Volume</label>
-                  <input
-                    type="range" min="0" max="1" step="0.01"
-                    value={volume}
-                    onInput={e => applyVolume((e.target as HTMLInputElement).value)}
-                    onChange={e => applyVolume(e.target.value)}
-                    className="w-full accent-primary"
-                  />
-                </div>
-
-                {/* Background sounds */}
-                <div>
-                  <label className="text-xs font-medium text-muted-foreground mb-2 block">Background Sound</label>
-                  <div className="flex gap-2 flex-wrap">
-                    {backgroundSounds.map(s => (
-                      <motion.button key={s.id} whileTap={{ scale: 0.92 }} onTap={() => setBgSound(s.id)}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                          bgSound === s.id
-                            ? 'bg-primary text-primary-foreground'
-                            : 'glass text-muted-foreground'
-                        }`}
-                      >
-                        {s.icon} {s.name}
-                      </motion.button>
-                    ))}
-                  </div>
-                  {bgSound !== 'none' && (
-                    <input
-                      type="range" min="0" max="1" step="0.01"
-                      value={bgVolume}
-                      onInput={e => applyBgVolume((e.target as HTMLInputElement).value)}
-                      onChange={e => applyBgVolume(e.target.value)}
-                      className="w-full accent-primary mt-3"
-                    />
-                  )}
-                </div>
-              </div>
-            )}
-
-            {settingsTab === 'timer' && (
-              <div className="space-y-5">
-                {/* Timer presets */}
-                <div>
-                  <label className="text-xs font-medium text-muted-foreground mb-2 block">Quick Timer</label>
-                  <div className="grid grid-cols-3 gap-2">
-                    {timerPresets.map(opt => (
-                      <motion.button key={opt.label} whileTap={{ scale: 0.92 }} onTap={() => setTimer(opt.value)}
-                        className={`py-2.5 rounded-xl text-xs font-medium transition-all flex flex-col items-center ${
-                          timerSeconds === opt.value
-                            ? 'bg-primary text-primary-foreground'
-                            : 'glass text-muted-foreground'
-                        }`}
-                      >
-                        <span className="font-semibold">{opt.label}</span>
-                        <span className="text-[9px] opacity-70 mt-0.5">{opt.description}</span>
-                      </motion.button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Custom timer */}
-                <div>
-                  <label className="text-xs font-medium text-muted-foreground mb-2 block">Custom Timer</label>
-                  <div className="flex gap-2 items-end">
-                    <div className="flex-1 glass rounded-xl px-3 py-2.5">
-                      <label className="text-[9px] text-muted-foreground">Hours</label>
-                      <input
-                        type="number"
-                        value={customHours}
-                        onChange={e => setCustomHours(e.target.value)}
-                        className="w-full bg-transparent text-foreground text-lg font-semibold outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                        min="0"
-                        max="12"
-                      />
-                    </div>
-                    <div className="flex-1 glass rounded-xl px-3 py-2.5">
-                      <label className="text-[9px] text-muted-foreground">Minutes</label>
-                      <input
-                        type="number"
-                        value={customMinutes}
-                        onChange={e => setCustomMinutes(e.target.value)}
-                        className="w-full bg-transparent text-foreground text-lg font-semibold outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                        min="0"
-                        max="59"
-                      />
-                    </div>
-                    <motion.button whileTap={{ scale: 0.92 }} onTap={applyCustomTimer}
-                      className="bg-primary text-primary-foreground px-4 py-3 rounded-xl text-xs font-semibold"
-                    >
-                      Set
-                    </motion.button>
-                  </div>
-                </div>
-
-                {/* Smart Routines */}
-                <div>
-                  <label className="text-xs font-medium text-muted-foreground mb-2 block">Smart Routines</label>
-                  <div className="space-y-2">
-                    {smartRoutines.map(routine => (
-                      <motion.button key={routine.id} whileTap={{ scale: 0.97 }} onTap={() => setTimer(routine.focusMinutes * 60)}
-                        className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all ${
-                          timerSeconds === routine.focusMinutes * 60
-                            ? 'bg-primary/10 border border-primary/30'
-                            : 'glass'
-                        }`}
-                      >
-                        <span className="text-xl">
-                          {routine.id === 'pomodoro' ? <Timer size={20} className="text-destructive" /> :
-                           routine.id === 'deep-work' ? <Brain size={20} className="text-primary" /> :
-                           <Moon size={20} className="text-warm" />}
-                        </span>
-                        <div className="flex-1 text-left">
-                          <p className="text-sm font-semibold text-foreground">{routine.name}</p>
-                          <p className="text-[10px] text-muted-foreground">{routine.description}</p>
-                        </div>
-                      </motion.button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   );
 }

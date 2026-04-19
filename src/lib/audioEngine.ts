@@ -2,15 +2,25 @@
 let audioCtx: AudioContext | null = null;
 let leftOsc: OscillatorNode | null = null;
 let rightOsc: OscillatorNode | null = null;
+let centerOsc: OscillatorNode | null = null;
+let beatLfo: OscillatorNode | null = null;
 let leftGain: GainNode | null = null;
 let rightGain: GainNode | null = null;
+let centerGain: GainNode | null = null;
+let beatLfoDepth: GainNode | null = null;
 let merger: ChannelMergerNode | null = null;
 let masterGain: GainNode | null = null;
+let outputCompressor: DynamicsCompressorNode | null = null;
 let bgNoiseSource: AudioBufferSourceNode | null = null;
 let bgGain: GainNode | null = null;
 let isPlaying = false;
 
 const FADE_DURATION = 0.1; // 100ms fade for smoothness
+const FREQUENCY_LOUDNESS_BOOST = 1.55;
+
+function getBoostedFrequencyVolume(volume: number) {
+  return Math.min(1, volume * FREQUENCY_LOUDNESS_BOOST);
+}
 
 // Cache for generated noise buffers
 const noiseBufferCache = new Map<string, AudioBuffer>();
@@ -41,10 +51,18 @@ export function startBinauralBeat(carrierHz: number, beatHz: number, volume: num
   // Create stereo separation for binaural effect
   merger = ctx.createChannelMerger(2);
   masterGain = ctx.createGain();
+  outputCompressor = ctx.createDynamicsCompressor();
+
+  // Keep boosted speaker loudness controlled to avoid hard clipping.
+  outputCompressor.threshold.value = -14;
+  outputCompressor.knee.value = 24;
+  outputCompressor.ratio.value = 12;
+  outputCompressor.attack.value = 0.003;
+  outputCompressor.release.value = 0.25;
   
   // Start with 0 volume and ramp up
   masterGain.gain.setValueAtTime(0, ctx.currentTime);
-  masterGain.gain.linearRampToValueAtTime(volume, ctx.currentTime + FADE_DURATION);
+  masterGain.gain.linearRampToValueAtTime(getBoostedFrequencyVolume(volume), ctx.currentTime + FADE_DURATION);
 
   // Left ear: carrier frequency
   leftOsc = ctx.createOscillator();
@@ -64,11 +82,35 @@ export function startBinauralBeat(carrierHz: number, beatHz: number, volume: num
   rightOsc.connect(rightGain);
   rightGain.connect(merger, 0, 1);
 
+  // Speaker-friendly layer: a center carrier with beat-rate amplitude modulation.
+  // This makes the beat perceptible without headphones while keeping binaural stereo cues.
+  centerOsc = ctx.createOscillator();
+  centerOsc.type = 'sine';
+  centerOsc.frequency.value = carrierHz + (beatHz / 2);
+
+  centerGain = ctx.createGain();
+  centerGain.gain.value = 0.36;
+
+  beatLfo = ctx.createOscillator();
+  beatLfo.type = 'sine';
+  beatLfo.frequency.value = Math.max(0.5, Math.abs(beatHz));
+
+  beatLfoDepth = ctx.createGain();
+  beatLfoDepth.gain.value = 0.22;
+
+  beatLfo.connect(beatLfoDepth);
+  beatLfoDepth.connect(centerGain.gain);
+  centerOsc.connect(centerGain);
+  centerGain.connect(masterGain);
+
   merger.connect(masterGain);
-  masterGain.connect(ctx.destination);
+  masterGain.connect(outputCompressor);
+  outputCompressor.connect(ctx.destination);
 
   leftOsc.start();
   rightOsc.start();
+  centerOsc.start();
+  beatLfo.start();
   isPlaying = true;
 }
 
@@ -82,6 +124,11 @@ export function stopBinauralBeat() {
   const currentMerger = merger;
   const currentLeftGain = leftGain;
   const currentRightGain = rightGain;
+  const currentCenterOsc = centerOsc;
+  const currentBeatLfo = beatLfo;
+  const currentCenterGain = centerGain;
+  const currentBeatLfoDepth = beatLfoDepth;
+  const currentOutputCompressor = outputCompressor;
 
   // Fade out
   currentMasterGain.gain.setValueAtTime(currentMasterGain.gain.value, ctx.currentTime);
@@ -92,27 +139,40 @@ export function stopBinauralBeat() {
     try {
       currentLeftOsc?.stop();
       currentRightOsc?.stop();
+      currentCenterOsc?.stop();
+      currentBeatLfo?.stop();
     } catch {}
     currentLeftOsc?.disconnect();
     currentRightOsc?.disconnect();
+    currentCenterOsc?.disconnect();
+    currentBeatLfo?.disconnect();
     currentLeftGain?.disconnect();
     currentRightGain?.disconnect();
+    currentCenterGain?.disconnect();
+    currentBeatLfoDepth?.disconnect();
     currentMerger?.disconnect();
     currentMasterGain?.disconnect();
+    currentOutputCompressor?.disconnect();
   }, FADE_DURATION * 1000 + 10);
 
   leftOsc = null;
   rightOsc = null;
   leftGain = null;
   rightGain = null;
+  centerOsc = null;
+  beatLfo = null;
+  centerGain = null;
+  beatLfoDepth = null;
   merger = null;
   masterGain = null;
+  outputCompressor = null;
   isPlaying = false;
 }
 
 export function setVolume(volume: number) {
   if (masterGain && audioCtx) {
-    masterGain.gain.setTargetAtTime(volume, audioCtx.currentTime, 0.05);
+    masterGain.gain.cancelScheduledValues(audioCtx.currentTime);
+    masterGain.gain.setValueAtTime(getBoostedFrequencyVolume(volume), audioCtx.currentTime);
   }
 }
 
@@ -139,20 +199,20 @@ function generateNoiseBuffer(ctx: AudioContext, type: string): AudioBuffer {
 
       switch (type) {
         case 'rain':
-          sample *= 0.3 * (1 + 0.3 * Math.sin(t * 2.5 + channel));
+          sample *= 0.45 * (1 + 0.3 * Math.sin(t * 2.5 + channel));
           break;
         case 'ocean':
-          sample *= 0.25 * (0.5 + 0.5 * Math.sin(t * 0.4 + channel * 0.5)) * (0.7 + 0.3 * Math.sin(t * 0.15));
+          sample *= 0.42 * (0.5 + 0.5 * Math.sin(t * 0.4 + channel * 0.5)) * (0.7 + 0.3 * Math.sin(t * 0.15));
           break;
         case 'forest':
-          sample *= 0.15 * (1 + 0.4 * Math.sin(t * 3 + channel));
+          sample *= 0.25 * (1 + 0.4 * Math.sin(t * 3 + channel));
           if (Math.random() < 0.0003) sample += Math.sin(t * 2000) * 0.2;
           break;
         case 'wind':
-          sample *= 0.2 * (0.6 + 0.4 * Math.sin(t * 0.7 + channel * 0.3));
+          sample *= 0.4 * (0.6 + 0.4 * Math.sin(t * 0.7 + channel * 0.3));
           break;
         default:
-          sample *= 0.2;
+          sample *= 0.3;
       }
       data[i] = sample;
     }
@@ -177,30 +237,31 @@ export function startBackgroundSound(type: string, volume: number = 0.3) {
   switch (type) {
     case 'rain':
       filter.type = 'bandpass';
-      filter.frequency.value = 800;
+      filter.frequency.value = 1000;
       filter.Q.value = 0.5;
       break;
     case 'ocean':
       filter.type = 'lowpass';
-      filter.frequency.value = 400;
+      filter.frequency.value = 1200;
       filter.Q.value = 0.3;
       break;
     case 'forest':
       filter.type = 'bandpass';
-      filter.frequency.value = 2000;
+      filter.frequency.value = 1800;
       filter.Q.value = 0.8;
       break;
     case 'wind':
-      filter.type = 'lowpass';
-      filter.frequency.value = 300;
-      filter.Q.value = 0.5;
+      filter.type = 'bandpass';
+      filter.frequency.value = 700;
+      filter.Q.value = 0.45;
       break;
   }
 
   bgGain = ctx.createGain();
+  const targetVolume = Math.min(1, volume * 1.6);
   // Fade in
   bgGain.gain.setValueAtTime(0, ctx.currentTime);
-  bgGain.gain.linearRampToValueAtTime(volume, ctx.currentTime + FADE_DURATION);
+  bgGain.gain.linearRampToValueAtTime(targetVolume, ctx.currentTime + FADE_DURATION);
 
   bgNoiseSource.connect(filter);
   filter.connect(bgGain);
@@ -234,7 +295,8 @@ export function stopBackgroundSound() {
 
 export function setBgVolume(volume: number) {
   if (bgGain && audioCtx) {
-    bgGain.gain.setTargetAtTime(volume, audioCtx.currentTime, 0.05);
+    bgGain.gain.cancelScheduledValues(audioCtx.currentTime);
+    bgGain.gain.setValueAtTime(Math.min(1, volume * 1.6), audioCtx.currentTime);
   }
 }
 

@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Send, CheckCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContextCore';
 import { toast } from 'sonner';
+import { createPortal } from 'react-dom';
 
 interface Props {
   open: boolean;
@@ -14,7 +15,23 @@ export default function FeedbackModal({ open, onClose }: Props) {
   const [feedback, setFeedback] = useState('');
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const { user } = useAuth();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!open) return;
+
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+    };
+  }, [open]);
 
   const handleSubmit = async () => {
     if (!feedback.trim()) return;
@@ -43,14 +60,16 @@ export default function FeedbackModal({ open, onClose }: Props) {
     }
   };
 
-  return (
+  if (!mounted) return null;
+
+  return createPortal(
     <AnimatePresence>
       {open && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 backdrop-blur-sm"
+          className="fixed inset-0 z-[120] flex items-end justify-center bg-black/45 backdrop-blur-sm"
           onClick={onClose}
         >
           <motion.div
@@ -59,7 +78,7 @@ export default function FeedbackModal({ open, onClose }: Props) {
             exit={{ y: 300 }}
             transition={{ type: 'spring', damping: 25 }}
             onClick={e => e.stopPropagation()}
-            className="w-full max-w-lg glass rounded-t-3xl p-6 pb-10"
+            className="w-full max-w-lg max-h-[85vh] overflow-y-auto glass rounded-t-3xl p-6 pb-10"
           >
             {sent ? (
               <motion.div
@@ -92,7 +111,7 @@ export default function FeedbackModal({ open, onClose }: Props) {
                   autoFocus
                 />
 
-                <motion.button whileTap={{ scale: 0.98 }} onTap={handleSubmit}
+                <motion.button whileTap={{ scale: 0.98 }} onClick={handleSubmit}
                   disabled={!feedback.trim() || sending}
                   className="w-full mt-4 py-3.5 rounded-xl bg-primary text-primary-foreground font-semibold text-sm flex items-center justify-center gap-2 disabled:opacity-50"
                 >
@@ -110,6 +129,7 @@ export default function FeedbackModal({ open, onClose }: Props) {
           </motion.div>
         </motion.div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 }
