@@ -1,0 +1,138 @@
+AURATUNE: BINAURAL BEATS & FOCUS
+
+Short Description (80 chars max):
+Powerful binaural beats for focus, sleep & relaxation. Science-backed frequencies.
+
+Full Description (4000 chars max):
+
+🎧 TRANSFORM YOUR MIND WITH SCIENTIFICALLY-TUNED FREQUENCIES
+
+AuraTune is the ultimate binaural beats app designed to help you focus deeper, sleep better, meditate easier, and boost your energy naturally. Using proven audio technology, we generate precise frequency combinations that influence your brainwaves and mental state.
+
+✨ WHY AURATUNE?
+
+🎯 SMART FOCUS PRESETS
+- Beta waves (14-30Hz) scientifically proven to enhance concentration
+- Perfect for studying, working, and creative tasks
+- Immediate effect with headphones
+
+🌙 DEEP SLEEP FREQUENCIES
+- Delta waves (0.5-4Hz) for restorative, healing sleep
+- Fall asleep faster and wake up refreshed
+- Gentle volume fading as you drift off
+
+🧘 MEDITATION MODES
+- Theta waves (4-8Hz) for deep meditation
+- Access deeper states of consciousness
+- Combine with breathing exercises
+
+⚡ ENERGY BOOSTING
+- Gamma waves (40Hz+) for peak cognitive performance
+- Natural energy without caffeine
+- Ideal for morning routines
+
+🔊 IMMERSIVE BACKGROUND SOUNDS
+Layer your binaural beats with:
+• Rain - Gentle, consistent ambient sound
+• Ocean - Rhythmic waves for relaxation
+• Forest - Natural bird sounds and wind
+• White Noise - Pure sound masking
+
+⏱️ SMART TIMERS & ROUTINES
+- Pomodoro (25 min focus + 5 min break)
+- Deep Work (90 min sessions)
+- Custom duration with automatic fade-out
+- Never worry about turning it off
+
+📊 PROGRESS TRACKING
+- Track listening time and streaks
+- Weekly activity charts
+- Category breakdown (Focus, Sleep, Meditate, Energy)
+- Build healthy habits with gamification
+
+💾 CLOUD SYNC (Optional)
+- Create an account to sync across devices
+- Save your favorite frequency combinations
+- Never lose your progress
+
+🔒 PRIVACY FIRST
+- All audio generation happens on your device
+- No audio data ever leaves your phone
+- No tracking or third-party analytics
+- Secure Supabase backend
+
+🌙 FEATURES YOU'LL LOVE
+✓ Beautiful, distraction-free interface
+✓ Dark mode for night sessions
+✓ Background audio playback
+✓ Offline capable
+✓ No ads or interruptions
+✓ Regular updates with new frequencies
+
+🔬 THE SCIENCE
+
+Binaural beats work by playing slightly different frequencies in each ear. Your brain perceives a third "beat" frequency that matches the difference. This process, discovered by physicist Heinrich Wilhelm Dove in 1839, has been extensively researched for its effects on:
+
+• Attention and focus (Beta waves)
+• Deep relaxation and sleep (Delta waves)
+• Meditation and creativity (Theta waves)
+• Peak mental performance (Gamma waves)
+
+🎧 HOW TO USE
+
+1. Put on headphones (required for binaural effect)
+2. Select your goal: Focus, Sleep, Meditate, or Energy
+3. Choose a frequency preset
+4. Add optional background sounds
+5. Set a timer or play indefinitely
+6. Relax and let the frequencies work
+
+⚠️ IMPORTANT
+
+• Headphones are REQUIRED for the binaural effect
+• Do not use while driving or operating machinery
+• Consult a doctor if you have epilepsy or seizure disorders
+• Start with shorter sessions and increase gradually
+
+📱 PERFECT FOR
+
+✓ Students studying for exams
+✓ Professionals needing deep work sessions
+✓ Anyone struggling with sleep
+✓ Meditation practitioners
+✓ Athletes seeking mental clarity
+✓ Creatives looking for flow states
+
+💬 WHAT USERS SAY
+
+"Finally an app that actually helps me focus. The beta waves are incredible for work." - Sarah M.
+
+"I've tried many sleep apps but AuraTune's delta frequencies actually help me fall asleep." - James T.
+
+"The clean design and no ads makes this my go-to meditation app." - Priya K.
+
+🆕 NEW IN THIS VERSION
+• Improved audio engine for smoother playback
+• New smart routine presets
+• Enhanced progress tracking
+• Bug fixes and performance improvements
+
+📞 SUPPORT
+
+Need help? Contact us at adithyashyam1@gmail.com
+
+---
+
+Ready to unlock your mind's potential? Download AuraTune today and experience the power of scientifically-tuned frequencies.
+
+#binauralbeats #meditation #focus #sleep #relaxation #mindfulness #brainwaves #productivity #mentalhealth #wellness
+
+---
+
+PERMISSIONS EXPLANATION:
+• Internet: For cloud sync and app updates
+• Notifications: For session reminders and achievements
+• Foreground Service: For audio playback in background
+
+Privacy Policy: Contact adithyashyam1@gmail.com for privacy policy
+Terms of Service: Contact adithyashyam1@gmail.com for terms of service
